@@ -35,6 +35,7 @@ makedocs(;
     modules = [Seams],
     checkdocs = :exports,
     doctest = true,
+    format = Documenter.HTML(; edit_link = "main"),
     repo = PublishedRemote(),
     pages = ["index.md"],
 )

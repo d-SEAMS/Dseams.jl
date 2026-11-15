@@ -44,7 +44,7 @@ makedocs(;
     modules = [Dseams],
     checkdocs = :exports,
     doctest = true,
-    format = Documenter.HTML(; prettyurls = get(ENV, "CI", "") == "true"),
+    format = Documenter.HTML(; prettyurls = get(ENV, "CI", "") == "true", edit_link = "main"),
     repo = PublishedRemote(),
     pages = ["Home" => "index.md", "API" => "api.md"],
 )
