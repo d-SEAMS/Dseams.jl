@@ -1,0 +1,83 @@
+# Builds libseams and libseams_lang from seams-core at SEAMS_CORE_REF and
+# runs Pkg.test for Dseams and Seams against them, with the seams-core
+# checkout data and the C++ census oracle turned on, then both manuals.
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # release/2.14.0 on HaoZeke/seams-core. Becomes the v2.14.0 tag on
+  # d-SEAMS/seams-core: set SEAMS_CORE_REPO to d-SEAMS/seams-core and
+  # SEAMS_CORE_REF to v2.14.0 once that tag exists.
+  SEAMS_CORE_REPO: HaoZeke/seams-core
+  SEAMS_CORE_REF: 2b5c3e00f60aeb7fda6e1e705d6cc61ec6d2c31c
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        julia: ["1.10.10", "1.11.6"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ env.SEAMS_CORE_REPO }}
+          ref: ${{ env.SEAMS_CORE_REF }}
+          path: seams-core
+      - uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347 # v0.10.1
+        with:
+          manifest-path: seams-core/pixi.toml
+          environments: default
+          cache-key: pixi-seams-core-
+      - name: Install chemfiles
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++
+          curl -fsSL -o "$RUNNER_TEMP/chemfiles.tar.gz" https://github.com/chemfiles/chemfiles/archive/refs/tags/0.10.4.tar.gz
+          tar -xzf "$RUNNER_TEMP/chemfiles.tar.gz" -C "$RUNNER_TEMP"
+          patch -d "$RUNNER_TEMP/chemfiles-0.10.4" -p1 < seams-core/cmake/patches/chemfiles-0.10.4-mmcif.patch
+          cmake -S "$RUNNER_TEMP/chemfiles-0.10.4" -B "$RUNNER_TEMP/chemfiles-build" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_SHARED_LIBS=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          cmake --build "$RUNNER_TEMP/chemfiles-build" -j2
+          sudo cmake --install "$RUNNER_TEMP/chemfiles-build"
+          sudo ldconfig
+      - name: Build seams-core
+        working-directory: seams-core
+        run: |
+          pixi run meson setup bbdir -Dwith_python=false -Dwith_tests=true -Dwith_cli=true
+          pixi run ninja -C bbdir bindings/libseams_lang.so bindings/binding_oracle src/libseams.so
+      - name: Install Julia
+        run: |
+          minor="${JULIA_VERSION%.*}"
+          curl -fsSL -o "$RUNNER_TEMP/julia.tar.gz" "https://julialang-s3.julialang.org/bin/linux/x64/${minor}/julia-${JULIA_VERSION}-linux-x86_64.tar.gz"
+          sudo tar -xzf "$RUNNER_TEMP/julia.tar.gz" -C /opt
+          echo "/opt/julia-${JULIA_VERSION}/bin" >> "$GITHUB_PATH"
+        env:
+          JULIA_VERSION: ${{ matrix.julia }}
+      - name: Engine settings
+        run: |
+          core="$GITHUB_WORKSPACE/seams-core"
+          {
+            echo "SEAMS_LANG_LIB=$core/bbdir/bindings/libseams_lang.so"
+            echo "SEAMS_LIB=$core/bbdir/src/libseams.so"
+            echo "SEAMS_CPP_ORACLE=$core/bbdir/bindings/binding_oracle"
+            echo "SEAMS_SOURCE_ROOT=$core"
+            echo "DSEAMS_ROOT=$core"
+          } >> "$GITHUB_ENV"
+      - name: Test Dseams
+        run: |
+          julia --project=. dev/develop_jll.jl
+          julia --project=. -e 'using Pkg; Pkg.test()'
+      - name: Test Seams
+        run: julia --project=lib/Seams -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
+      - name: Manuals
+        run: |
+          julia --project=docs docs/make.jl
+          julia --project=lib/Seams/docs lib/Seams/docs/make.jl
