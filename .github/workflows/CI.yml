@@ -1,15 +1,19 @@
 # Builds libseams and libseams_lang from seams-core at SEAMS_CORE_REF and
 # runs Pkg.test for Dseams and Seams against them, with the seams-core
 # checkout data and the C++ census oracle turned on, then both manuals.
+# A push to main or a vX.Y.Z tag also publishes the Dseams manual (with
+# llms.txt) to gh-pages from the Julia 1.11 job.
 name: CI
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
   workflow_dispatch:
 
+# contents: write lets deploydocs push the manual to gh-pages.
 permissions:
-  contents: read
+  contents: write
 
 env:
   # release/2.14.0 on HaoZeke/seams-core. Becomes the v2.14.0 tag on
@@ -78,6 +82,9 @@ jobs:
       - name: Test Seams
         run: julia --project=lib/Seams -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
       - name: Manuals
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DSEAMS_DEPLOY_DOCS: ${{ matrix.julia == '1.11.6' && github.repository == 'd-SEAMS/Dseams.jl' && github.event_name == 'push' }}
         run: |
           julia --project=docs docs/make.jl
           julia --project=lib/Seams/docs lib/Seams/docs/make.jl

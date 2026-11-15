@@ -31,3 +31,7 @@ jobs:
       - uses: JuliaRegistries/TagBot@87cc4cc2b4639f6c743f5772f376a32914060732 # v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          # A tag pushed with GITHUB_TOKEN starts no workflow. With a deploy
+          # key in DOCUMENTER_KEY the tag runs CI, which publishes that
+          # version of the manual.
+          ssh: ${{ secrets.DOCUMENTER_KEY }}

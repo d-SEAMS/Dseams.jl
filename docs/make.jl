@@ -48,3 +48,12 @@ makedocs(;
     repo = PublishedRemote(),
     pages = ["Home" => "index.md", "Examples" => "examples.md", "API" => "api.md"],
 )
+
+# llms.txt at the site root, next to index.html.
+cp(joinpath(docsdir, "..", "llms.txt"), joinpath(docsdir, "build", "llms.txt"); force = true)
+
+# CI sets DSEAMS_DEPLOY_DOCS on one job, so a push to main publishes /dev
+# and a vX.Y.Z tag publishes that version on gh-pages.
+if get(ENV, "DSEAMS_DEPLOY_DOCS", "") == "true"
+    deploydocs(; repo = "github.com/d-SEAMS/Dseams.jl.git", devbranch = "main")
+end
