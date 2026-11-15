@@ -13,12 +13,12 @@ primitive_rings(f; graph = "cutoff", max_depth = 6)[6]    # 256
 
 ## Dseams and Seams
 
-seams-core has two Julia packages. **Dseams** is the one to install. It
-reads trajectories and has the same frame analyses as the R package. It
-calls `libseams_lang`, the C ABI shared by the R and Julia fronts, and is
-what the bindings CI and the documentation run.
+This repository has two Julia packages. **Dseams** (the repository root)
+is the one to install. It reads trajectories and has the same frame
+analyses as the R package. It calls `libseams_lang`, the C ABI shared by
+the R and Julia fronts.
 
-`bindings/julia/Seams` is a short example of the stable C API in
+`lib/Seams` is a short example of the stable C API in seams-core's
 `include/seams.h` (`libseams`). It works on coordinates the caller passes
 in and reads no files. It is kept as an example of that API and is not
 registered.
@@ -26,12 +26,12 @@ registered.
 ## The engine library
 
 `libseams_jll` provides the engine for Linux (glibc and musl; x86_64,
-aarch64, powerpc64le, riscv64) and macOS once the recipe in
+aarch64, powerpc64le, riscv64) and macOS once the recipe in seams-core's
 `packaging/yggdrasil/L/libseams` is merged into Yggdrasil. Neither it nor
 Dseams is in the General registry yet. Until then `dev/develop_jll.jl`
 develops a stand-in `libseams_jll` with no binaries, and the engine is a
-local build. To use a local build of seams-core, name its
-`libseams_lang`:
+local build of [seams-core](https://github.com/d-SEAMS/seams-core). To use
+one, name its `libseams_lang`:
 
 ```julia
 Dseams.set_library!("/path/to/seams-core/build/bindings/libseams_lang.so")

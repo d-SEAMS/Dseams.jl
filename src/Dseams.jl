@@ -8,7 +8,7 @@ The library comes from `libseams_jll`. A local build is used instead when
 the `SEAMS_LANG_LIB` environment variable or the `libseams_lang`
 preference names it; see [`Dseams.set_library!`](@ref).
 
-CxxWrap is not required. Ice Ih (`input/traj/ice1h.lammpstrj`, every
+CxxWrap is not required. Ice Ih (`data/ice1h.lammpstrj`, every
 atom) is 128 hexagonal waters and 256 primitive six-rings.
 
 The C API names re-exported here call `libseams` (`SEAMS_LIB`, else the
@@ -534,8 +534,8 @@ function q4_q6(frame::Frame; cutoff::Real = 3.5, type::Integer = 0)
     Q4Q6(q4, q6, q4bar, q6bar)
 end
 
-# A copy of bindings/julia/capi.jl, so the registered package is complete.
-# The checkout test checks that the two files agree.
+# lib/Seams/src/capi.jl is the same file; test/runtests.jl checks that the
+# two copies agree.
 include("capi.jl")
 
 end

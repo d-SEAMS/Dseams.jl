@@ -2,7 +2,7 @@ using Test
 using Dseams
 
 # The counts and the relative tolerance are the R front checks in
-# bindings/r/dseams/tests/testthat/test-ice.R.
+# tests/testthat/test-ice.R of the dseams R package.
 
 const tip = Dseams.example_path("exampleTraj.lammpstrj")
 const nucleation = Dseams.example_path("nucleation_f1.lammpstrj")
@@ -71,8 +71,18 @@ end
     @test isnan(tau) || isfinite(tau)
 end
 
-# A seams-core checkout has the larger trajectories, and the originals of
-# the copies in data/.
+# Seams carries its own copy of the ccall layer and of the oracle check, so
+# that each package directory is complete. The copies must not drift.
+@testset "shared files agree with lib/Seams" begin
+    seams = joinpath(pkgdir(Dseams), "lib", "Seams")
+    @test read(joinpath(seams, "src", "capi.jl")) ==
+          read(joinpath(pkgdir(Dseams), "src", "capi.jl"))
+    @test read(joinpath(seams, "test", "cpp_match.jl")) ==
+          read(joinpath(@__DIR__, "cpp_match.jl"))
+end
+
+# DSEAMS_ROOT names a seams-core checkout, which has the larger
+# trajectories and the originals of the copies in data/.
 if !isempty(root)
     @testset "checkout data" begin
         for name in readdir(Dseams.DATA)
@@ -84,17 +94,16 @@ if !isempty(root)
         @test chill_plus(frame).counts["cubic"] == 4096
         @test cages(frame).n_ic == 4096
         @test nframes(cubic) >= 1
-        @test read(joinpath(root, "bindings", "julia", "capi.jl")) ==
-              read(joinpath(@__DIR__, "..", "src", "capi.jl"))
     end
 end
 
-# seams.h against the C++ census, when a checkout build names the oracle.
+# seams.h against the C++ census, when a seams-core build names the oracle
+# (SEAMS_CPP_ORACLE) and SEAMS_SOURCE_ROOT is its checkout.
 oracle = get(ENV, "SEAMS_CPP_ORACLE", "")
-cpp_match = joinpath(@__DIR__, "..", "..", "cpp_match.jl")
+cpp_match = joinpath(@__DIR__, "cpp_match.jl")
 if !isempty(oracle) && isfile(oracle) && isfile(cpp_match)
     @testset "seams.h matches the C++ path" begin
-        include(joinpath(@__DIR__, "..", "..", "cpp_match.jl"))
+        include(cpp_match)
         check_seams_against_cpp()
     end
 end

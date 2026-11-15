@@ -3,9 +3,9 @@
 # General registry, then instantiate. A project that depends on Dseams
 # (docs/, for one) gets this checkout of Dseams too.
 #
-#   julia --project=bindings/julia/Dseams develop_jll.jl
+#   julia --project=. dev/develop_jll.jl
 #       the stand-in in dev/libseams_jll, which has no binaries
-#   julia --project=ENV develop_jll.jl PATH
+#   julia --project=ENV dev/develop_jll.jl PATH
 #       a JLL from `julia build_tarballs.jl --deploy=local`
 #       (~/.julia/dev/libseams_jll)
 using Pkg

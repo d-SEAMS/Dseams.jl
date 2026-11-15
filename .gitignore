@@ -1,0 +1,5 @@
+Manifest.toml
+LocalPreferences.toml
+.instantiate.lock
+/docs/build/
+/lib/Seams/docs/build/

@@ -12,7 +12,7 @@ Handles are mutable structs with finalizers. A failing call throws
 own their pointers. Result structs iterate in field order, so
 `labels, counts = chill_plus(sys)` still unpacks.
 
-Ice Ih (`input/traj/ice1h.lammpstrj`, every atom) is 128 hexagonal waters
+Ice Ih (seams-core `input/traj/ice1h.lammpstrj`, every atom) is 128 hexagonal waters
 and 256 primitive six-rings.
 
 The C API names re-exported here are seams_system_count, seams_system_read,
@@ -33,7 +33,7 @@ export seams_density_axis, seams_fingerprint, seams_contact_pairs, seams_domains
 export seams_monolayer, seams_rings_vertices, seams_site_table
 export SeamsError, ChillLabels, Q4Q6Pair, SixRings
 
-include(joinpath(@__DIR__, "..", "..", "capi.jl"))
+include("capi.jl")
 
 """Published CHILL+ rule. Matches `SEAMS_CHILL_PUBLISHED`."""
 const PUBLISHED = 0

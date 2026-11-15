@@ -36,9 +36,10 @@ end
     @test fraction > 0.5
 end
 
-# seams.h against the C++ census, when a checkout build names the oracle.
+# seams.h against the C++ census, when a seams-core build names the oracle
+# (SEAMS_CPP_ORACLE) and SEAMS_SOURCE_ROOT is its checkout.
 oracle = get(ENV, "SEAMS_CPP_ORACLE", "")
-cpp_match = joinpath(@__DIR__, "..", "..", "cpp_match.jl")
+cpp_match = joinpath(@__DIR__, "cpp_match.jl")
 if !isempty(oracle) && isfile(oracle) && isfile(cpp_match)
     @testset "seams.h matches the C++ path" begin
         include(cpp_match)

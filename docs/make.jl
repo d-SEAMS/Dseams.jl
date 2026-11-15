@@ -1,10 +1,11 @@
 # Copyright (c) d-SEAMS developers
 # Build the Dseams manual and run every doctest.
 #
-#   julia --project=docs docs/make.jl
+#   SEAMS_LANG_LIB=/path/to/build/bindings/libseams_lang.so \
+#       julia --project=docs docs/make.jl
 #
-# Before libseams_jll is registered, first run dev/develop_jll.jl in the
-# docs project (see its header).
+# The doctests call the engine, so SEAMS_LANG_LIB (or the libseams_lang
+# preference) names a seams-core build until libseams_jll is registered.
 using Pkg
 
 docsdir = @__DIR__
@@ -27,21 +28,15 @@ stripped == text || write(proj, stripped)
 using Documenter
 using Dseams
 
-root = normpath(joinpath(docsdir, "..", "..", "..", ".."))
-lang = joinpath(root, "bbdir", "bindings", "libseams_lang.so")
-if isfile(lang)
-    ENV["SEAMS_LANG_LIB"] = lang
-    ENV["LD_LIBRARY_PATH"] = joinpath(root, "bbdir", "bindings") * ":" * joinpath(root, "bbdir", "src")
-end
-
 DocMeta.setdocmeta!(Dseams, :DocTestSetup, :(using Dseams); recursive = true)
 
-# Same remote as the Seams manual: the file on main, with no line fragment.
+# Source links go to the file on main, with no line fragment: GitHub's
+# static page has no id for #Lnn, so the link checker rejects it.
 struct PublishedRemote <: Documenter.Remotes.Remote end
-Documenter.Remotes.repourl(::PublishedRemote) = "https://github.com/d-SEAMS/seams-core"
+Documenter.Remotes.repourl(::PublishedRemote) = "https://github.com/d-SEAMS/Dseams.jl"
 function Documenter.Remotes.fileurl(::PublishedRemote, ::AbstractString, filename::AbstractString, linerange)
     filename = lstrip(replace(filename, '\\' => '/'), '/')
-    return "https://github.com/d-SEAMS/seams-core/blob/main/$(filename)"
+    return "https://github.com/d-SEAMS/Dseams.jl/blob/main/$(filename)"
 end
 
 makedocs(;
