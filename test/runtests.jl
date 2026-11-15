@@ -97,6 +97,8 @@ if !isempty(root)
     end
 end
 
+include("examples.jl")
+
 # seams.h against the C++ census, when a seams-core build names the oracle
 # (SEAMS_CPP_ORACLE) and SEAMS_SOURCE_ROOT is its checkout.
 oracle = get(ENV, "SEAMS_CPP_ORACLE", "")
