@@ -43,6 +43,7 @@ in `build/bindings` compares the `seams.h` calls with the C++ census).
 |---|---|
 | `Project.toml`, `src/`, `test/`, `data/` | Dseams, the registered package |
 | `docs/` | Dseams manual (`julia --project=docs docs/make.jl`) |
+| `examples/` | Scripts from the seams-core docs; `test/examples.jl` runs them |
 | `dev/` | `develop_jll.jl` and the stand-in `libseams_jll` |
 | `lib/Seams/` | Seams, an unregistered example of the `libseams` C API |
 
