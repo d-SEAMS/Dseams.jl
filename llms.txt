@@ -2,7 +2,7 @@
 
 > Dseams is the Julia front for the d-SEAMS engine: CHILL+, primitive rings, ice and clathrate cages, Steinhardt order parameters and shell symmetry on LAMMPS trajectories.
 
-The package is `Dseams`. It calls `libseams_lang`, the C ABI of the d-SEAMS engine, through `ccall`, and gets the library from `libseams_jll` or from a local build named by `SEAMS_LANG_LIB`. Julia 1.10 or newer. The engine, its C API and its documentation site are in d-SEAMS/seams-core; this repository holds only Julia code. Each manual link below is a page of the Documenter site at https://d-seams.github.io/Dseams.jl/dev/, and the source markdown of each page is under `docs/src` in the repository. Contributor instructions are in the contributor contract at the repository root, next to README.md.
+The package is `Dseams`. It calls `libseams_lang`, the C ABI of the d-SEAMS engine, through `ccall`, and gets the library from `libseams_jll` or from a local build named by `SEAMS_LANG_LIB`. Julia 1.10 or newer. The engine, its C API and its documentation site are in d-SEAMS/seams-core; this repository holds only Julia code. Each manual link below is a page of the Documenter site at https://d-seams.github.io/Dseams.jl/dev/, and the source markdown of each page is under `docs/src` in the repository. Contributor instructions are in the contributing guide at the repository root, next to README.md.
 
 ## Manual
 
@@ -13,7 +13,7 @@ The package is `Dseams`. It calls `libseams_lang`, the C ABI of the d-SEAMS engi
 ## Project
 
 - [README](https://github.com/d-SEAMS/Dseams.jl/blob/main/README.md): Quick start, a local engine build, layout, development and release order.
-- [Repository root](https://github.com/d-SEAMS/Dseams.jl): The contributor contract: layout, test commands, how seams-core and libseams_jll are pinned and found, commit and changelog conventions.
+- [Repository root](https://github.com/d-SEAMS/Dseams.jl): The contributing guide: layout, test commands, how seams-core and libseams_jll are pinned and found, commit and changelog conventions.
 - [CHANGELOG.md](https://github.com/d-SEAMS/Dseams.jl/blob/main/CHANGELOG.md): Changes by release, Keep a Changelog format.
 - [Seams](https://github.com/d-SEAMS/Dseams.jl/tree/main/lib/Seams): Unregistered example package over the stable `libseams` C API.
 

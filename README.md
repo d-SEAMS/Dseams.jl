@@ -57,7 +57,7 @@ and the C ABI that Dseams calls (`bindings/cxx/seams_lang.h`) are in
 [d-SEAMS/seams-core](https://github.com/d-SEAMS/seams-core), together
 with the Yggdrasil recipe for `libseams_jll`. A change to analysis
 results goes there first; this repository then moves to the released
-engine. The contributor contract at the repository root has the
+engine. The contributing guide at the repository root has the
 conventions, and `CHANGELOG.md` the changes by release.
 
 To work against a local seams-core checkout, build its libraries and
