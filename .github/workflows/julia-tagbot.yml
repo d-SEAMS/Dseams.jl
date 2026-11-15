@@ -1,6 +1,5 @@
-# Tags a Dseams release (Dseams-vX.Y.Z) after General merges it. The
-# package is in a subdirectory, so the tags carry the package name and do
-# not collide with the seams-core vX.Y.Z tags.
+# Tags a Dseams release (vX.Y.Z) after General merges it. Dseams is the
+# repository root, so the tags are plain versions.
 name: TagBot
 on:
   issue_comment:
@@ -26,10 +25,9 @@ permissions:
 
 jobs:
   TagBot:
-    if: github.repository == 'd-SEAMS/seams-core' && (github.event_name == 'workflow_dispatch' || github.actor == 'JuliaTagBot')
+    if: github.repository == 'd-SEAMS/Dseams.jl' && (github.event_name == 'workflow_dispatch' || github.actor == 'JuliaTagBot')
     runs-on: ubuntu-latest
     steps:
       - uses: JuliaRegistries/TagBot@87cc4cc2b4639f6c743f5772f376a32914060732 # v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          subdir: bindings/julia/Dseams
