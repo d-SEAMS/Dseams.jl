@@ -1,6 +1,11 @@
 # Copyright (c) d-SEAMS developers
-# Science tutorials in Julia. Same numbers as science_tutorials.py.
-# Usage: julia science_tutorials.jl ROOT [brine_t0 brine_tend]
+# Science tutorials in Julia, on the stable C API (libseams, SEAMS_LIB).
+# Same numbers as seams-core docs/examples/science_tutorials.py.
+#
+#   julia examples/science_tutorials.jl [ROOT [brine_t0 brine_tend]]
+#
+# ROOT is a seams-core checkout (default DSEAMS_ROOT); the frames are in
+# its input/traj.
 
 using Libdl
 
@@ -110,7 +115,7 @@ function layer_score(projection, period)
     hypot(re, im) / length(projection)
 end
 
-root = ARGS[1]
+root = isempty(ARGS) ? ENV["DSEAMS_ROOT"] : ARGS[1]
 ccall(dlsym(_so(), :seams_set_num_threads), Cint, (Cint,), 1)
 iface = joinpath(root, "input", "traj", "interface_f0.lammpstrj")
 labels, counts = chill_file(iface)

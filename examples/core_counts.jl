@@ -2,6 +2,10 @@
 # Ice Ih and sII census through Dseams.
 # Ice Ih: 128 hexagonal, 256 six-rings.
 # sII: 136 clathrate, 144 five-rings, 16 six-rings.
+#
+#   DSEAMS_ROOT=/path/to/seams-core julia --project=. examples/core_counts.jl
+#
+# Ice Ih ships in data/; the sII cell is seams-core input/traj/genice_sII.lammpstrj.
 using Dseams
 
 function census(path)
@@ -11,10 +15,12 @@ function census(path)
     ice, rings
 end
 
-ice, ice_rings = census("input/traj/ice1h.lammpstrj")
+root = get(ENV, "DSEAMS_ROOT", "")
+@assert !isempty(root) "DSEAMS_ROOT names a seams-core checkout"
+ice, ice_rings = census(Dseams.ice_ih_path())
 @assert ice.counts["hexagonal"] == 128
 @assert ice_rings[6] == 256
-sii, sii_rings = census("input/traj/genice_sII.lammpstrj")
+sii, sii_rings = census(joinpath(root, "input", "traj", "genice_sII.lammpstrj"))
 @assert sii.counts["clathrate"] == 136
 @assert sii_rings[5] == 144
 @assert sii_rings[6] == 16
