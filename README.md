@@ -42,7 +42,7 @@ in `build/bindings` compares the `seams.h` calls with the C++ census).
 | Path | Contents |
 |---|---|
 | `Project.toml`, `src/`, `test/`, `data/` | Dseams, the registered package |
-| `docs/` | Dseams manual (`julia --project=docs docs/make.jl`) |
+| `docs/` | Dseams manual (`julia --project=docs docs/make.jl`), published with `llms.txt` |
 | `examples/` | Scripts from the seams-core docs; `test/examples.jl` runs them |
 | `dev/` | `develop_jll.jl` and the stand-in `libseams_jll` |
 | `lib/Seams/` | Seams, an unregistered example of the `libseams` C API |
@@ -50,11 +50,48 @@ in `build/bindings` compares the `seams.h` calls with the C++ census).
 `src/capi.jl` and `lib/Seams/src/capi.jl` are the same file, as are the
 two `test/cpp_match.jl`; the Dseams tests fail when they differ.
 
-## Registering
+## Development
 
-`Project.toml` is ready for Registrator (`uuid`, `version`, and
-`[compat]`, with `libseams_jll` held at `=2.14.0`). General can resolve
-that dependency only after `libseams_jll` is registered from the
-Yggdrasil recipe in seams-core's `packaging/yggdrasil`. The
-`Register Dseams` workflow then asks JuliaRegistrator to register the
-chosen commit, and TagBot tags the release `vX.Y.Z`.
+Dseams.jl holds only Julia code. The engine, its C API (`include/seams.h`)
+and the C ABI that Dseams calls (`bindings/cxx/seams_lang.h`) are in
+[d-SEAMS/seams-core](https://github.com/d-SEAMS/seams-core), together
+with the Yggdrasil recipe for `libseams_jll`. A change to analysis
+results goes there first; this repository then moves to the released
+engine. The contributor contract at the repository root has the
+conventions, and `CHANGELOG.md` the changes by release.
+
+To work against a local seams-core checkout, build its libraries and
+point the package at them:
+
+```sh
+cd /path/to/seams-core
+meson setup bbdir
+ninja -C bbdir bindings/libseams_lang.so bindings/binding_oracle src/libseams.so
+
+cd /path/to/Dseams.jl
+CORE=/path/to/seams-core
+export SEAMS_LANG_LIB=$CORE/bbdir/bindings/libseams_lang.so
+export SEAMS_LIB=$CORE/bbdir/src/libseams.so
+export DSEAMS_ROOT=$CORE SEAMS_SOURCE_ROOT=$CORE
+export SEAMS_CPP_ORACLE=$CORE/bbdir/bindings/binding_oracle
+julia --project=. dev/develop_jll.jl
+julia --project=. -e 'using Pkg; Pkg.test()'
+julia --project=docs docs/make.jl
+```
+
+CI does the same against the seams-core commit pinned as
+`SEAMS_CORE_REF` in `.github/workflows/CI.yml`.
+
+## Release order
+
+1. seams-core tags the engine release (`v2.14.0`).
+2. `libseams_jll` of that version is registered in General from the
+   Yggdrasil recipe.
+3. `SEAMS_CORE_REF` moves to that tag, `Project.toml` carries the same
+   version with `libseams_jll = "=2.14.0"`, and CI is green on `main`.
+4. The `Register Dseams` workflow asks JuliaRegistrator to register that
+   commit. TagBot tags `vX.Y.Z` once General merges it, and the tag
+   publishes that version of the manual.
+
+Dseams cannot be registered before step 2: General refuses a package
+whose `[compat]` names an unregistered dependency.
