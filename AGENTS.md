@@ -85,7 +85,8 @@ Every exported function has a docstring with a `jldoctest`
 
 1. seams-core tags the engine release, and `libseams_jll` of that version
    is merged into General.
-2. Here, `Project.toml` has that version and `libseams_jll = "=X.Y.Z"`,
+2. Here, `Project.toml` and `CITATION.cff` have that version,
+   `[compat]` has `libseams_jll = "=X.Y.Z"`,
    `SEAMS_CORE_REF` names the seams-core tag, and CI is green on `main`.
 3. Run the `Register Dseams` workflow on that commit. TagBot tags `vX.Y.Z`
    after General merges the registration.
