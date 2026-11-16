@@ -2,7 +2,7 @@
 # runs Pkg.test for Dseams and Seams against them, with the seams-core
 # checkout data and the C++ census oracle turned on, then both manuals.
 # A push to main or a vX.Y.Z tag also publishes the Dseams manual (with
-# llms.txt) to gh-pages from the Julia 1.11 job.
+# llms.txt) to gh-pages from the job on the current Julia release.
 name: CI
 on:
   push:
@@ -28,7 +28,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        julia: ["1.10.10", "1.11.6"]
+        # The long-term-support release and the current release.
+        julia: ["lts", "1"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -46,14 +47,9 @@ jobs:
         run: |
           pixi run meson setup bbdir -Dwith_tests=true -Dwith_cli=true
           pixi run ninja -C bbdir bindings/libseams_lang.so bindings/binding_oracle src/libseams.so
-      - name: Install Julia
-        run: |
-          minor="${JULIA_VERSION%.*}"
-          curl -fsSL -o "$RUNNER_TEMP/julia.tar.gz" "https://julialang-s3.julialang.org/bin/linux/x64/${minor}/julia-${JULIA_VERSION}-linux-x86_64.tar.gz"
-          sudo tar -xzf "$RUNNER_TEMP/julia.tar.gz" -C /opt
-          echo "/opt/julia-${JULIA_VERSION}/bin" >> "$GITHUB_PATH"
-        env:
-          JULIA_VERSION: ${{ matrix.julia }}
+      - uses: julia-actions/setup-julia@da908477b5db94c10ffce8cfea9f2b3b9d5db687 # v3.0.3
+        with:
+          version: ${{ matrix.julia }}
       - name: Engine settings
         run: |
           core="$GITHUB_WORKSPACE/seams-core"
@@ -73,7 +69,7 @@ jobs:
       - name: Manuals
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DSEAMS_DEPLOY_DOCS: ${{ matrix.julia == '1.11.6' && github.repository == 'd-SEAMS/Dseams.jl' && github.event_name == 'push' }}
+          DSEAMS_DEPLOY_DOCS: ${{ matrix.julia == '1' && github.repository == 'd-SEAMS/Dseams.jl' && github.event_name == 'push' }}
         run: |
           julia --project=docs docs/make.jl
           julia --project=lib/Seams/docs lib/Seams/docs/make.jl
