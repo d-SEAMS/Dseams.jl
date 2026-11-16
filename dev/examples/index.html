@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="referrer" content="no-referrer"/><title>Examples · Dseams</title><meta name="title" content="Examples · Dseams"/><meta property="og:title" content="Examples · Dseams"/><meta property="twitter:title" content="Examples · Dseams"/><meta name="description" content="Documentation for Dseams."/><meta property="og:description" content="Documentation for Dseams."/><meta property="twitter:description" content="Documentation for Dseams."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.63.2/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">Dseams</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>Examples</a><ul class="internal"><li><a class="tocitem" href="#Neighbours,-rings-and-CHILL"><span>Neighbours, rings and CHILL+</span></a></li><li><a class="tocitem" href="#CHILL-and-q4/q6-on-the-TIP4P/ice-frame"><span>CHILL+ and q4/q6 on the TIP4P/ice frame</span></a></li><li><a class="tocitem" href="#Ice-Ih-and-sII-census"><span>Ice Ih and sII census</span></a></li><li><a class="tocitem" href="#The-GenIce-sI-cell"><span>The GenIce sI cell</span></a></li><li><a class="tocitem" href="#Science-tutorials-on-the-C-API"><span>Science tutorials on the C API</span></a></li></ul></li><li><a class="tocitem" href="../api/">API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Examples</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/d-SEAMS/Dseams.jl" title="View the repository"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">Repository</span></a><a class="docs-navbar-link" href="https://github.com/d-SEAMS/Dseams.jl/blob/main/docs/src/examples.md" title="Edit source"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h1><p>The scripts in <code>examples/</code> run in the test suite: <code>test/examples.jl</code> starts each one in its own process and checks its exit status and the line it prints. <code>lang_tasks.jl</code> and <code>julia_api.jl</code> read the frames in <code>data/</code>. The others read seams-core&#39;s <code>input/traj</code> and run when <code>DSEAMS_ROOT</code> names a seams-core checkout.</p><h2 id="Neighbours,-rings-and-CHILL"><a class="docs-heading-anchor" href="#Neighbours,-rings-and-CHILL">Neighbours, rings and CHILL+</a><a id="Neighbours,-rings-and-CHILL-1"></a><a class="docs-heading-anchor-permalink" href="#Neighbours,-rings-and-CHILL" title="Permalink"></a></h2><p><code>neighbour_pairs</code>, <code>primitive_rings</code>, and <code>chill_plus</code> on ice Ih. The ring dictionary omits empty sizes, so the printed histogram asks for each size from 0 through 6. Every seams-core language example prints the same line, <code>pairs 512 rings 0 0 0 0 0 0 256 chill 0 128 0 0 0 0 0 0 0</code>.</p><pre><code class="language-julia hljs"># Copyright (c) d-SEAMS developers
+# Neighbours, rings, and CHILL+ from Julia on the ice Ih cell in data/.
+# The line it prints is the one every seams-core language example prints:
+#   pairs 512 rings 0 0 0 0 0 0 256 chill 0 128 0 0 0 0 0 0 0
+#
+#   julia --project=. examples/lang_tasks.jl
+using Dseams
+
+const labels = (
+    &quot;cubic&quot;,
+    &quot;hexagonal&quot;,
+    &quot;water&quot;,
+    &quot;interfacial&quot;,
+    &quot;clathrate&quot;,
+    &quot;interClathrate&quot;,
+    &quot;unclassified&quot;,
+    &quot;reCubic&quot;,
+    &quot;reHex&quot;,
+)
+
+frame = read_frame(Dseams.ice_ih_path(); type = -1)
+pairs = neighbour_pairs(frame; cutoff = 3.5, graph = &quot;cutoff&quot;)
+rings = primitive_rings(frame; cutoff = 3.5, graph = &quot;cutoff&quot;, max_depth = 6)
+histogram = [get(rings.counts, size, 0) for size in 0:6]
+ice = chill_plus(frame; cutoff = 3.5, graph = &quot;cutoff&quot;)
+counts = [ice.counts[name] for name in labels]
+println(
+    &quot;pairs &quot;,
+    pairs,
+    &quot; rings &quot;,
+    join(histogram, &quot; &quot;),
+    &quot; chill &quot;,
+    join(counts, &quot; &quot;),
+)</code></pre><h2 id="CHILL-and-q4/q6-on-the-TIP4P/ice-frame"><a class="docs-heading-anchor" href="#CHILL-and-q4/q6-on-the-TIP4P/ice-frame">CHILL+ and q4/q6 on the TIP4P/ice frame</a><a id="CHILL-and-q4/q6-on-the-TIP4P/ice-frame-1"></a><a class="docs-heading-anchor-permalink" href="#CHILL-and-q4/q6-on-the-TIP4P/ice-frame" title="Permalink"></a></h2><pre><code class="language-julia hljs"># Copyright (c) d-SEAMS developers
+# CHILL+ and q4/q6 on the TIP4P/ice frame shipped in data/.
+#
+#   julia --project=. examples/julia_api.jl
+using Dseams
+
+frame = read_frame(Dseams.example_path(&quot;exampleTraj.lammpstrj&quot;); type = 2)
+@assert nop(frame) == 250
+ice = chill_plus(frame)
+@assert ice.counts[&quot;interClathrate&quot;] == 9
+@assert ice.counts[&quot;water&quot;] == 241
+order = q4_q6(frame)
+@assert length(order.q6) == nop(frame)
+println(&quot;julia api ok&quot;)</code></pre><h2 id="Ice-Ih-and-sII-census"><a class="docs-heading-anchor" href="#Ice-Ih-and-sII-census">Ice Ih and sII census</a><a id="Ice-Ih-and-sII-census-1"></a><a class="docs-heading-anchor-permalink" href="#Ice-Ih-and-sII-census" title="Permalink"></a></h2><pre><code class="language-julia hljs"># Copyright (c) d-SEAMS developers
+# Ice Ih and sII census through Dseams.
+# Ice Ih: 128 hexagonal, 256 six-rings.
+# sII: 136 clathrate, 144 five-rings, 16 six-rings.
+#
+#   DSEAMS_ROOT=/path/to/seams-core julia --project=. examples/core_counts.jl
+#
+# Ice Ih ships in data/; the sII cell is seams-core input/traj/genice_sII.lammpstrj.
+using Dseams
+
+function census(path)
+    frame = read_frame(path)
+    ice = chill_plus(frame; cutoff = 3.5, graph = &quot;cutoff&quot;)
+    rings = primitive_rings(frame; cutoff = 3.5, graph = &quot;cutoff&quot;)
+    ice, rings
+end
+
+root = get(ENV, &quot;DSEAMS_ROOT&quot;, &quot;&quot;)
+@assert !isempty(root) &quot;DSEAMS_ROOT names a seams-core checkout&quot;
+ice, ice_rings = census(Dseams.ice_ih_path())
+@assert ice.counts[&quot;hexagonal&quot;] == 128
+@assert ice_rings[6] == 256
+sii, sii_rings = census(joinpath(root, &quot;input&quot;, &quot;traj&quot;, &quot;genice_sII.lammpstrj&quot;))
+@assert sii.counts[&quot;clathrate&quot;] == 136
+@assert sii_rings[5] == 144
+@assert sii_rings[6] == 16
+println(&quot;julia hexagonal 128 rings6 256 clathrate 136 rings5 144&quot;)</code></pre><h2 id="The-GenIce-sI-cell"><a class="docs-heading-anchor" href="#The-GenIce-sI-cell">The GenIce sI cell</a><a id="The-GenIce-sI-cell-1"></a><a class="docs-heading-anchor-permalink" href="#The-GenIce-sI-cell" title="Permalink"></a></h2><pre><code class="language-julia hljs"># Copyright (c) d-SEAMS developers
+# Read the GenIce sI cell: neighbours via steinhardt, then q6, CHILL+, rings.
+#
+#   julia --project=. examples/minimal_julia.jl /path/to/seams-core/input/traj/genice_sI.lammpstrj
+#
+# With no argument the cell is read from DSEAMS_ROOT.
+using Dseams
+
+mean(values) = sum(values) / length(values)
+
+path = isempty(ARGS) ? joinpath(ENV[&quot;DSEAMS_ROOT&quot;], &quot;input&quot;, &quot;traj&quot;, &quot;genice_sI.lammpstrj&quot;) : ARGS[1]
+frame = read_frame(path)
+@assert nop(frame) == 46
+order = steinhardt(frame, 6; cutoff = 3.5)
+@assert length(order.ql) == 46
+@assert mean(order.ql) &gt; 0.5
+ice = chill_plus(frame)
+@assert ice.counts[&quot;clathrate&quot;] == 46
+rings = primitive_rings(frame; graph = &quot;cutoff&quot;)
+@assert rings[5] == 48
+@assert rings[6] == 54
+println(&quot;julia example ok&quot;)</code></pre><h2 id="Science-tutorials-on-the-C-API"><a class="docs-heading-anchor" href="#Science-tutorials-on-the-C-API">Science tutorials on the C API</a><a id="Science-tutorials-on-the-C-API-1"></a><a class="docs-heading-anchor-permalink" href="#Science-tutorials-on-the-C-API" title="Permalink"></a></h2><p>The interface and nucleus layer stacks and the clathrate cage counts, called through <code>libseams</code> with <code>ccall</code> and no package beyond <code>Libdl</code>.</p><pre><code class="language-julia hljs"># Copyright (c) d-SEAMS developers
+# Science tutorials in Julia, on the stable C API (libseams, SEAMS_LIB).
+# Same numbers as seams-core docs/examples/science_tutorials.py.
+#
+#   julia examples/science_tutorials.jl [ROOT [brine_t0 brine_tend]]
+#
+# ROOT is a seams-core checkout (default DSEAMS_ROOT); the frames are in
+# its input/traj.
+
+using Libdl
+
+const LIB = get(ENV, &quot;SEAMS_LIB&quot;, &quot;libseams&quot;)
+
+# Julia 1.13 rejects a runtime library name inside ccall.
+const _dl = Ref{Ptr{Cvoid}}(C_NULL)
+
+function _so()
+    if _dl[] == C_NULL
+        _dl[] = dlopen(LIB)
+    end
+    _dl[]
+end
+
+function chill_file(path)
+    sys = ccall(dlsym(_so(), :seams_system_create), Ptr{Cvoid}, ())
+    code = ccall(dlsym(_so(), :seams_system_read), Cint, (Ptr{Cvoid}, Cstring, Cint, Cint), sys, path, 1, -1)
+    code == 0 || error(&quot;read $path&quot;)
+    n = ccall(dlsym(_so(), :seams_system_count), Cint, (Ptr{Cvoid},), sys)
+    labels = Vector{Cint}(undef, n)
+    counts = Vector{Cint}(undef, 9)
+    code = ccall(dlsym(_so(), :seams_chill_plus), Cint,
+                 (Ptr{Cvoid}, Cdouble, Cint, Cint, Cint, Ptr{Cint}, Ptr{Cint}),
+                 sys, 3.5, 0, 0, 0, labels, counts)
+    ccall(dlsym(_so(), :seams_system_destroy), Cvoid, (Ptr{Cvoid},), sys)
+    code == 0 || error(&quot;chill+ $path&quot;)
+    Int.(labels), Int.(counts)
+end
+
+function cages_of(path, spec)
+    sys = ccall(dlsym(_so(), :seams_system_create), Ptr{Cvoid}, ())
+    ccall(dlsym(_so(), :seams_system_read), Cint, (Ptr{Cvoid}, Cstring, Cint, Cint), sys, path, 1, -1) == 0 || error(path)
+    n_cages = Ref{Csize_t}(0)
+    n_atoms = Ref{Csize_t}(0)
+    ccall(dlsym(_so(), :seams_cages_signature), Cint,
+          (Ptr{Cvoid}, Cdouble, Cint, Cint, Cstring, Ptr{Csize_t}, Ptr{Csize_t}),
+          sys, 3.5, 0, 0, spec, n_cages, n_atoms) == 0 || error(spec)
+    ccall(dlsym(_so(), :seams_system_destroy), Cvoid, (Ptr{Cvoid},), sys)
+    Int(n_cages[])
+end
+
+function read_dump(path)
+    pos = NTuple{3,Float64}[]
+    open(path) do io
+        reading = false
+        for line in eachline(io)
+            if startswith(line, &quot;ITEM: ATOMS&quot;)
+                reading = true
+            elseif reading
+                parts = split(line)
+                length(parts) &lt; 5 &amp;&amp; break
+                push!(pos, (parse(Float64, parts[3]), parse(Float64, parts[4]), parse(Float64, parts[5])))
+            end
+        end
+    end
+    pos
+end
+
+function layer_period(projection)
+    best_score, best = -1.0, 3.6
+    mean = sum(projection) / length(projection)
+    for step in 0:15
+        period = 3.30 + (4.05 - 3.30) * step / 15
+        re = im = 0.0
+        for value in projection
+            angle = 2π / period * (value - mean)
+            re += cos(angle)
+            im += sin(angle)
+        end
+        score = hypot(re, im) / length(projection)
+        if score &gt; best_score
+            best_score = score
+            best = period
+        end
+    end
+    best
+end
+
+function layer_string(pos, labels, axis)
+    chosen = [i for i in eachindex(labels) if labels[i] == 0 || labels[i] == 1]
+    projection = [pos[i][axis] for i in chosen]
+    kinds = [labels[i] for i in chosen]
+    period = layer_period(projection)
+    lo = minimum(projection)
+    bins = [floor(Int, (value - lo) / period) for value in projection]
+    letters = Char[]
+    for index in 0:maximum(bins)
+        selected = [kinds[j] for j in eachindex(bins) if bins[j] == index]
+        isempty(selected) &amp;&amp; continue
+        hexagonal = count(==(1), selected)
+        cubic = count(==(0), selected)
+        hexagonal + cubic == 0 &amp;&amp; continue
+        push!(letters, hexagonal &gt;= cubic ? &#39;H&#39; : &#39;C&#39;)
+    end
+    String(letters)
+end
+
+function layer_score(projection, period)
+    mean = sum(projection) / length(projection)
+    re = im = 0.0
+    for value in projection
+        angle = 2π / period * (value - mean)
+        re += cos(angle)
+        im += sin(angle)
+    end
+    hypot(re, im) / length(projection)
+end
+
+root = isempty(ARGS) ? ENV[&quot;DSEAMS_ROOT&quot;] : ARGS[1]
+ccall(dlsym(_so(), :seams_set_num_threads), Cint, (Cint,), 1)
+iface = joinpath(root, &quot;input&quot;, &quot;traj&quot;, &quot;interface_f0.lammpstrj&quot;)
+labels, counts = chill_file(iface)
+stack = layer_string(read_dump(iface), labels, 3)
+counts[2] == 352 &amp;&amp; counts[3] == 434 &amp;&amp; counts[4] == 49 &amp;&amp; counts[1] == 1 || error(counts)
+stack == &quot;HHHHHHHHC&quot; || error(stack)
+println(&quot;interface hexagonal 352 water 434 interfacial 49 cubic 1&quot;)
+println(&quot;interface layers &quot;, stack)
+
+function strongest(pos, labels)
+    best_axis, best_score = 1, -1.0
+    for axis in 1:3
+        projection = [pos[i][axis] for i in eachindex(labels) if labels[i] == 0 || labels[i] == 1]
+        score = layer_score(projection, layer_period(projection))
+        if score &gt; best_score
+            best_score = score
+            best_axis = axis
+        end
+    end
+    best_axis
+end
+
+nuc = joinpath(root, &quot;input&quot;, &quot;traj&quot;, &quot;nucleation_f1.lammpstrj&quot;)
+nlabels, ncounts = chill_file(nuc)
+npos = read_dump(nuc)
+best_axis = strongest(npos, nlabels)
+nstack = layer_string(npos, nlabels, best_axis)
+ncounts[1] == 47 &amp;&amp; ncounts[2] == 62 &amp;&amp; ncounts[3] == 3589 &amp;&amp; ncounts[4] == 240 || error(ncounts)
+best_axis == 1 &amp;&amp; nstack == &quot;CHHHCHHHHHHHHH&quot; || error((best_axis, nstack))
+println(&quot;nucleus cubic 47 hexagonal 62 water 3589 interfacial 240&quot;)
+println(&quot;nucleus axis x layers &quot;, nstack)
+
+sii = joinpath(root, &quot;input&quot;, &quot;traj&quot;, &quot;genice_sII.lammpstrj&quot;)
+sh = joinpath(root, &quot;input&quot;, &quot;traj&quot;, &quot;genice_sH.lammpstrj&quot;)
+cages_of(sii, &quot;512&quot;) == 16 || error(&quot;sII 512&quot;)
+cages_of(sii, &quot;51264&quot;) == 8 || error(&quot;sII 51264&quot;)
+cages_of(sh, &quot;512&quot;) == 12 || error(&quot;sH 512&quot;)
+cages_of(sh, &quot;sh&quot;) == 8 || error(&quot;sH sh&quot;)
+cages_of(sh, &quot;51268&quot;) == 4 || error(&quot;sH 51268&quot;)
+println(&quot;cages sII 512 16&quot;)
+println(&quot;cages sII 51264 8&quot;)
+println(&quot;cages sH 512 12&quot;)
+println(&quot;cages sH sh 8&quot;)
+println(&quot;cages sH 51268 4&quot;)
+
+function hexagonal_oxygens(path)
+    count = 0
+    for line in eachline(path)
+        startswith(line, &quot;O &quot;) || continue
+        split(line)[5] == &quot;hexagonal&quot; &amp;&amp; (count += 1)
+    end
+    count
+end
+
+if length(ARGS) &lt; 3
+    println(&quot;brine tutorial skipped: cannot fetch d-SEAMS/brine-front-230K at 4828e33ecf419c70643b2d466bfa4f283b4138dc&quot;)
+else
+    hexagonal_oxygens(ARGS[2]) == 733 || error(&quot;brine t0&quot;)
+    hexagonal_oxygens(ARGS[3]) == 741 || error(&quot;brine tend&quot;)
+    println(&quot;brine t0 hexagonal 733&quot;)
+    println(&quot;brine tend hexagonal 741&quot;)
+end
+
+# Julia 1.13 faults in ijl_process_events while it unloads the OpenMP
+# runtime that libseams opened. The census is already printed.
+flush(stdout)
+ccall(:exit, Cvoid, (Cint,), 0)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.20.0 on <span class="colophon-date" title="Monday 16 November 2026 00:34">Monday 16 November 2026</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
