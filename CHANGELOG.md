@@ -7,6 +7,11 @@ and the version follows the d-SEAMS engine release in `libseams_jll`.
 
 ## [Unreleased]
 
+### Changed
+
+- Seams declares `julia = "1.10"`, the oldest Julia that CI tests, in
+  place of 1.9.
+
 ## [2.14.0]
 
 ### Changed
