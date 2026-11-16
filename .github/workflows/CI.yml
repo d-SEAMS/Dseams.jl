@@ -20,7 +20,7 @@ env:
   # d-SEAMS/seams-core: set SEAMS_CORE_REPO to d-SEAMS/seams-core and
   # SEAMS_CORE_REF to v2.14.0 once that tag exists.
   SEAMS_CORE_REPO: HaoZeke/seams-core
-  SEAMS_CORE_REF: 2b5c3e00f60aeb7fda6e1e705d6cc61ec6d2c31c
+  SEAMS_CORE_REF: 628b0af94b4d3bf52426708a0d08436027c8e4fa
 
 jobs:
   test:
@@ -55,7 +55,7 @@ jobs:
       - name: Build seams-core
         working-directory: seams-core
         run: |
-          pixi run meson setup bbdir -Dwith_python=false -Dwith_tests=true -Dwith_cli=true
+          pixi run meson setup bbdir -Dwith_tests=true -Dwith_cli=true
           pixi run ninja -C bbdir bindings/libseams_lang.so bindings/binding_oracle src/libseams.so
       - name: Install Julia
         run: |
