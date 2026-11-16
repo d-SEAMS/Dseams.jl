@@ -10,7 +10,7 @@ on:
         default: "3"
 
 permissions:
-  actions: read
+  actions: write
   checks: read
   contents: write
   deployments: read
@@ -31,7 +31,20 @@ jobs:
       - uses: JuliaRegistries/TagBot@87cc4cc2b4639f6c743f5772f376a32914060732 # v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          # A tag pushed with GITHUB_TOKEN starts no workflow. With a deploy
-          # key in DOCUMENTER_KEY the tag runs CI, which publishes that
-          # version of the manual.
-          ssh: ${{ secrets.DOCUMENTER_KEY }}
+      # A tag pushed with GITHUB_TOKEN starts no push run, but GITHUB_TOKEN
+      # may dispatch one. Every vX.Y.Z tag without a folder on gh-pages gets
+      # a CI run on that tag, which publishes that version of the manual.
+      - name: Publish the manual for new tags
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tags=$(gh api --paginate "repos/${GITHUB_REPOSITORY}/tags" --jq '.[].name')
+          # gh-pages does not exist before the first deploy.
+          published=$(gh api "repos/${GITHUB_REPOSITORY}/git/trees/gh-pages" --jq '.tree[].path' 2>/dev/null || true)
+          for tag in $tags; do
+            if printf '%s\n' "$tag" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+$' &&
+              ! printf '%s\n' "$published" | grep -qxF "$tag"; then
+              echo "dispatching CI on ${tag}"
+              gh workflow run CI.yml --repo "$GITHUB_REPOSITORY" --ref "$tag"
+            fi
+          done

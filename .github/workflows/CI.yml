@@ -2,7 +2,9 @@
 # runs Pkg.test for Dseams and Seams against them, with the seams-core
 # checkout data and the C++ census oracle turned on, then both manuals.
 # A push to main or a vX.Y.Z tag also publishes the Dseams manual (with
-# llms.txt) to gh-pages from the job on the current Julia release.
+# llms.txt) to gh-pages from the job on the current Julia release. A tag
+# that TagBot pushes with GITHUB_TOKEN starts no push run, so TagBot
+# dispatches this workflow on the tag instead.
 name: CI
 on:
   push:
@@ -69,7 +71,7 @@ jobs:
       - name: Manuals
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DSEAMS_DEPLOY_DOCS: ${{ matrix.julia == '1' && github.repository == 'd-SEAMS/Dseams.jl' && github.event_name == 'push' }}
+          DSEAMS_DEPLOY_DOCS: ${{ matrix.julia == '1' && github.repository == 'd-SEAMS/Dseams.jl' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
         run: |
           julia --project=docs docs/make.jl
           julia --project=lib/Seams/docs lib/Seams/docs/make.jl
