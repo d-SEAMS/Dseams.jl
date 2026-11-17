@@ -79,7 +79,12 @@ jobs:
           julia --project=docs docs/make.jl
           julia --project=lib/Seams/docs lib/Seams/docs/make.jl
       - name: Documentation SEO
-        run: python3 docs/seo.py check docs/build
+        run: |
+          base_url="https://julia.dseams.info/"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            base_url="${base_url}${GITHUB_REF_NAME}/"
+          fi
+          python3 docs/seo.py check docs/build --base-url "$base_url"
       # README and the built manual. The published root URL is mapped to
       # the build, so a page this commit adds resolves before it deploys.
       # GitHub answers some blob pages with 503 under concurrent requests;

@@ -13,6 +13,8 @@ import shutil
 import sys
 from pathlib import Path
 
+import seo
+
 MANIFEST = ".dseams-root-files.json"
 CNAME = "julia.dseams.info"
 
@@ -58,6 +60,7 @@ def copy_tree(source, destination):
 
 
 def validate_site(root, base_url):
+    seo.check(root, base_url)
     index = root / "index.html"
     if not index.is_file():
         fail(f"{root} has no index.html")
@@ -80,6 +83,8 @@ def validate_site(root, base_url):
 
 
 def deploy_root(source, destination):
+    base_url = f"https://{CNAME}/"
+    validate_site(source, base_url)
     manifest = destination / MANIFEST
     if manifest.is_file():
         entries = json.loads(manifest.read_text(encoding="utf-8"))
@@ -95,26 +100,28 @@ def deploy_root(source, destination):
         versions.unlink()
     copy_tree(source, destination)
 
-    # Keep existing /dev/ links useful, but make them duplicates whose
-    # canonical URLs point to the custom-domain root.
     dev = destination / "dev"
     if dev.exists() or dev.is_symlink():
         if dev.is_symlink() or dev.is_file():
             dev.unlink()
         else:
             shutil.rmtree(dev)
-    copy_tree(source, dev)
 
     manifest.write_text(
         json.dumps(source_files(source), indent=2) + "\n", encoding="utf-8"
     )
     (destination / "CNAME").write_text(CNAME + "\n", encoding="utf-8")
-    validate_site(destination, f"https://{CNAME}/")
+    validate_site(source, base_url)
+    index = destination / "index.html"
+    if index.read_bytes() != (source / "index.html").read_bytes():
+        fail(f"{index} does not match the Documenter build")
 
 
 def deploy_tag(source, destination, version):
     if not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", version):
         fail(f"invalid documentation version: {version}")
+    base_url = f"https://{CNAME}/{version}/"
+    validate_site(source, base_url)
     target = destination / version
     if target.exists() or target.is_symlink():
         if target.is_symlink() or target.is_file():
@@ -123,7 +130,7 @@ def deploy_tag(source, destination, version):
             shutil.rmtree(target)
     copy_tree(source, target)
     (destination / "CNAME").write_text(CNAME + "\n", encoding="utf-8")
-    validate_site(target, f"https://{CNAME}/{version}/")
+    validate_site(target, base_url)
     if (destination / "index.html").is_file():
         validate_site(destination, f"https://{CNAME}/")
 

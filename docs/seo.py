@@ -201,7 +201,12 @@ def content(tag):
     return html.unescape(match.group(1)).strip() if match else ""
 
 
-def check(root):
+def href(tag):
+    match = re.search(r'\bhref\s*=\s*["\']([^"\']*)', tag.group(0), re.I)
+    return html.unescape(match.group(1)).strip() if match else ""
+
+
+def check(root, base_url):
     pages = sorted(root.rglob("*.html"))
     if not pages:
         raise ValueError(f"no HTML pages found in {root}")
@@ -229,6 +234,8 @@ def check(root):
         ]
         og_image = attribute(text, "meta", "property", "og:image")
         twitter_image = attribute(text, "meta", "name", "twitter:image")
+        og_url = attribute(text, "meta", "property", "og:url")
+        expected_canonical = canonical_url(base_url, relative)
         missing = []
         if not title or not re.sub(r"<[^>]+>", "", title.group(1)).strip():
             missing.append("title")
@@ -236,6 +243,10 @@ def check(root):
             missing.append("description")
         if not canonical:
             missing.append("canonical")
+        elif href(canonical) != expected_canonical:
+            missing.append(f"canonical={expected_canonical}")
+        if not og_url or content(og_url) != expected_canonical:
+            missing.append(f"og:url={expected_canonical}")
         if not all(og) or not all(content(tag) for tag in og if tag):
             missing.append("Open Graph tags")
         if not all(twitter) or not all(content(tag) for tag in twitter if tag):
@@ -304,7 +315,7 @@ def main():
         if args.command == "apply":
             apply(args.root, args.base_url)
         else:
-            check(args.root)
+            check(args.root, args.base_url)
     except ValueError as error:
         print(error, file=sys.stderr)
         return 1
