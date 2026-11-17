@@ -81,6 +81,9 @@ jobs:
           julia --project=lib/Seams/docs lib/Seams/docs/make.jl
       # README and the built manual. The published /dev URL is mapped to
       # the build, so a page this commit adds resolves before it deploys.
+      # GitHub answers some blob pages with 503 under concurrent requests;
+      # 503 says the host is busy, not that the link is gone, so it is
+      # accepted. A 404 still fails.
       - name: Link check
         if: matrix.julia == '1'
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
@@ -92,9 +95,74 @@ jobs:
             --retry-wait-time 5
             --timeout 30
             --max-concurrency 4
-            --accept 200,206,429
+            --accept 200,206,429,503
             --index-files index.html
             --root-dir ${{ github.workspace }}/docs/build
-            --remap "https://d-seams.github.io/Dseams.jl/dev file://${{ github.workspace }}/docs/build"
+            --remap "https://julia.dseams.info/dev file://${{ github.workspace }}/docs/build"
+            --remap "https://github.com/d-SEAMS/Dseams.jl/blob/main file://${{ github.workspace }}"
             README.md docs/build
+          token: ${{ secrets.GITHUB_TOKEN }}
+      # Every page of the manual as its published URL, for the live check.
+      # A tag publishes /vX.Y.Z/, a push to main /dev/.
+      - name: List the manual pages
+        if: matrix.julia == '1'
+        working-directory: docs/build
+        env:
+          VERSION_DIR: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'dev' }}
+        run: find . -name '*.html' | sed -e 's#^\./##' -e 's#index\.html$##' -e "s#^#https://julia.dseams.info/$VERSION_DIR/#" | sort > "$GITHUB_WORKSPACE/site-pages.txt"
+      - if: matrix.julia == '1'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site-pages
+          path: site-pages.txt
+
+  # The published manual, page by page, once GitHub Pages has built the
+  # gh-pages commit that deploydocs pushed. Each page is fetched from
+  # julia.dseams.info and its links are resolved against that page, so a
+  # page or a link missing from the live site fails the workflow. Source
+  # links into this repository were checked against the checkout in the
+  # test job and are not fetched from GitHub again.
+  live:
+    needs: test
+    if: github.repository == 'd-SEAMS/Dseams.jl' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .lycheeignore
+          sparse-checkout-cone-mode: false
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: site-pages
+      - name: Wait for the Pages build of gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          head=$(gh api "repos/$GITHUB_REPOSITORY/branches/gh-pages" --jq .commit.sha)
+          for _ in $(seq 1 60); do
+            build=$(gh api "repos/$GITHUB_REPOSITORY/pages/builds/latest" --jq '"\(.commit) \(.status)"')
+            echo "$build"
+            [ "$build" = "$head built" ] && exit 0
+            sleep 10
+          done
+          echo "Pages did not build $head" >&2
+          exit 1
+      - id: pages
+        run: echo "urls=$(tr '\n' ' ' < site-pages.txt)" >> "$GITHUB_OUTPUT"
+      - name: Live link check
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          fail: true
+          args: >-
+            --no-progress
+            --max-retries 3
+            --retry-wait-time 10
+            --timeout 30
+            --max-concurrency 4
+            --accept 200,202,206,429,503
+            --exclude "^https://github\.com/d-SEAMS/Dseams.jl/blob/main/"
+            ${{ steps.pages.outputs.urls }}
           token: ${{ secrets.GITHUB_TOKEN }}
