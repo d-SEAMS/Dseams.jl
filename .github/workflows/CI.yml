@@ -79,3 +79,22 @@ jobs:
         run: |
           julia --project=docs docs/make.jl
           julia --project=lib/Seams/docs lib/Seams/docs/make.jl
+      # README and the built manual. The published /dev URL is mapped to
+      # the build, so a page this commit adds resolves before it deploys.
+      - name: Link check
+        if: matrix.julia == '1'
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          fail: true
+          args: >-
+            --no-progress
+            --max-retries 3
+            --retry-wait-time 5
+            --timeout 30
+            --max-concurrency 4
+            --accept 200,206,429
+            --index-files index.html
+            --root-dir ${{ github.workspace }}/docs/build
+            --remap "https://d-seams.github.io/Dseams.jl/dev file://${{ github.workspace }}/docs/build"
+            README.md docs/build
+          token: ${{ secrets.GITHUB_TOKEN }}
