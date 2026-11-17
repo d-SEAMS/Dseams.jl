@@ -3,6 +3,7 @@ message: "If you use this software, please cite the d-SEAMS article in preferred
 title: "Dseams.jl: Julia interface to the d-SEAMS engine"
 type: software
 version: "2.14.0"
+date-released: 2026-11-17
 license: MIT
 repository-code: "https://github.com/d-SEAMS/Dseams.jl"
 url: "https://docs.dseams.info"
