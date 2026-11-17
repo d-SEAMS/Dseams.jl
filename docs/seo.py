@@ -302,7 +302,7 @@ def check(root, base_url):
             errors.append("root index.html is a meta-refresh deployment shell")
     if errors:
         raise ValueError("\n".join(errors))
-    print(f"SEO metadata ok ({len(pages)} HTML pages)")
+    print(f"Search metadata ok ({len(pages)} HTML pages)")
 
 
 def main():
