@@ -11,6 +11,15 @@ f = read_frame(Dseams.ice_ih_path(); type = -1)
 chill_plus(f; graph = "cutoff").counts["hexagonal"]   # 128
 ```
 
+## Documentation
+
+- Manual, with the examples and the API reference:
+  <https://d-seams.github.io/Dseams.jl/dev/>
+- The Julia chapter of the d-SEAMS book:
+  <https://docs.dseams.info/stable/julia.html>
+- A video walk-through of the package:
+  <https://odysee.com/dseams-julia:ec237bd28c57b7bdfa2996ccc420c16d9799176f>
+
 ## A local engine build
 
 Dseams and `libseams_jll` are not in the General registry yet. Until they
