@@ -99,7 +99,7 @@ jobs:
             --index-files index.html
             --root-dir ${{ github.workspace }}/docs/build
             --remap "https://julia.dseams.info/dev file://${{ github.workspace }}/docs/build"
-            --remap "https://github.com/d-SEAMS/Dseams.jl/(blob|tree)/main file://${{ github.workspace }}"
+            --remap "https://github.com/d-SEAMS/Dseams.jl/blob/main file://${{ github.workspace }}"
             README.md docs/build
           token: ${{ secrets.GITHUB_TOKEN }}
       # Every page of the manual as its published URL, for the live check.
@@ -163,6 +163,6 @@ jobs:
             --timeout 30
             --max-concurrency 4
             --accept 200,202,206,429,503
-            --exclude "^https://github\.com/d-SEAMS/Dseams.jl/(blob|tree)/main/"
+            --exclude "^https://github\.com/d-SEAMS/Dseams.jl/blob/main/"
             ${{ steps.pages.outputs.urls }}
           token: ${{ secrets.GITHUB_TOKEN }}
