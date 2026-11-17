@@ -11,6 +11,13 @@ chill_plus(f; graph = "cutoff").counts["hexagonal"]       # 128
 primitive_rings(f; graph = "cutoff", max_depth = 6)[6]    # 256
 ```
 
+The [Julia chapter](https://docs.dseams.info/stable/julia.html) of the d-SEAMS book covers the same front, and
+a [video walk-through](https://odysee.com/dseams-julia:ec237bd28c57b7bdfa2996ccc420c16d9799176f) shows the package in use.
+
+```@raw html
+<iframe id="odysee-iframe" title="Dseams.jl walk-through" width="560" height="315" src="https://odysee.com/$/embed/dseams-julia:ec237bd28c57b7bdfa2996ccc420c16d9799176f" allowfullscreen></iframe>
+```
+
 ## Dseams and Seams
 
 This repository has two Julia packages. **Dseams** (the repository root)
