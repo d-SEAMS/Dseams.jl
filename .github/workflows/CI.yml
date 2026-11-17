@@ -17,7 +17,7 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
-# contents: write lets deploydocs push the manual to gh-pages.
+# The current Julia job publishes the generated manual to gh-pages.
 permissions:
   contents: write
 
@@ -75,13 +75,12 @@ jobs:
       - name: Manuals
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DSEAMS_DEPLOY_DOCS: ${{ matrix.julia == '1' && github.repository == 'd-SEAMS/Dseams.jl' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
         run: |
           julia --project=docs docs/make.jl
           julia --project=lib/Seams/docs lib/Seams/docs/make.jl
       - name: Documentation SEO
         run: python3 docs/seo.py check docs/build
-      # README and the built manual. The published /dev URL is mapped to
+      # README and the built manual. The published root URL is mapped to
       # the build, so a page this commit adds resolves before it deploys.
       # GitHub answers some blob pages with 503 under concurrent requests;
       # 503 says the host is busy, not that the link is gone, so it is
@@ -100,18 +99,49 @@ jobs:
             --accept 200,206,429,503
             --index-files index.html
             --root-dir ${{ github.workspace }}/docs/build
-            --remap "https://julia.dseams.info/dev file://${{ github.workspace }}/docs/build"
+            --remap "https://julia.dseams.info file://${{ github.workspace }}/docs/build"
             --remap "https://github.com/d-SEAMS/Dseams.jl/blob/main file://${{ github.workspace }}"
             README.md docs/build
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Reject an empty root deployment
+        if: matrix.julia == '1'
+        run: |
+          rm -rf "$RUNNER_TEMP/docs-site"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            python3 docs/deploy_site.py docs/build "$RUNNER_TEMP/docs-site" --version "$GITHUB_REF_NAME"
+          else
+            python3 docs/deploy_site.py docs/build "$RUNNER_TEMP/docs-site" --root
+          fi
+      - name: Check out the published site
+        if: matrix.julia == '1' && github.repository == 'd-SEAMS/Dseams.jl' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: gh-pages
+          path: docs-site
+      - name: Publish crawlable documentation
+        if: matrix.julia == '1' && github.repository == 'd-SEAMS/Dseams.jl' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            python3 docs/deploy_site.py docs/build docs-site --version "$GITHUB_REF_NAME"
+          else
+            python3 docs/deploy_site.py docs/build docs-site --root
+          fi
+          cd docs-site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "docs: publish $GITHUB_SHA"
+            git push origin HEAD:gh-pages
+          fi
       # Every page of the manual as its published URL, for the live check.
-      # A tag publishes /vX.Y.Z/, a push to main /dev/.
+      # A tag publishes /vX.Y.Z/, while main is served directly at /.
       - name: List the manual pages
         if: matrix.julia == '1'
         working-directory: docs/build
         env:
-          VERSION_DIR: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'dev' }}
-        run: find . -name '*.html' | sed -e 's#^\./##' -e 's#index\.html$##' -e "s#^#https://julia.dseams.info/$VERSION_DIR/#" | sort > "$GITHUB_WORKSPACE/site-pages.txt"
+          SITE_ROOT: ${{ startsWith(github.ref, 'refs/tags/') && format('https://julia.dseams.info/{0}/', github.ref_name) || 'https://julia.dseams.info/' }}
+        run: find . -name '*.html' | sed -e 's#^\./##' -e 's#index\.html$##' -e "s#^#$SITE_ROOT#" | sort > "$GITHUB_WORKSPACE/site-pages.txt"
       - if: matrix.julia == '1'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -119,7 +149,7 @@ jobs:
           path: site-pages.txt
 
   # The published manual, page by page, once GitHub Pages has built the
-  # gh-pages commit that deploydocs pushed. Each page is fetched from
+  # gh-pages commit that the current Julia job pushed. Each page is fetched from
   # julia.dseams.info and its links are resolved against that page, so a
   # page or a link missing from the live site fails the workflow. Source
   # links into this repository were checked against the checkout in the

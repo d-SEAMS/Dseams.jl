@@ -39,13 +39,12 @@ function Documenter.Remotes.fileurl(::PublishedRemote, ::AbstractString, filenam
     return "https://github.com/d-SEAMS/Dseams.jl/blob/main/$(filename)"
 end
 
-version_dir = startswith(get(ENV, "GITHUB_REF", ""), "refs/tags/") ?
-              get(ENV, "GITHUB_REF_NAME", "dev") : "dev"
-canonical_root = get(
-    ENV,
-    "DSEAMS_DOCS_URL",
-    "https://julia.dseams.info/$(version_dir)/",
-)
+is_tag_build = startswith(get(ENV, "GITHUB_REF", ""), "refs/tags/")
+version_dir = is_tag_build ? get(ENV, "GITHUB_REF_NAME", "") : ""
+canonical_default = isempty(version_dir) ?
+                    "https://julia.dseams.info/" :
+                    "https://julia.dseams.info/$(version_dir)/"
+canonical_root = get(ENV, "DSEAMS_DOCS_URL", canonical_default)
 
 makedocs(;
     sitename = "Dseams.jl Molecular Trajectory Analysis",
@@ -64,11 +63,3 @@ makedocs(;
 # llms.txt at the site root, next to index.html.
 cp(joinpath(docsdir, "..", "llms.txt"), joinpath(docsdir, "build", "llms.txt"); force = true)
 run(`python3 $(joinpath(docsdir, "seo.py")) apply $(joinpath(docsdir, "build")) --base-url $(canonical_root)`)
-
-# CI sets DSEAMS_DEPLOY_DOCS on one job, so a push to main publishes /dev
-# and a vX.Y.Z tag publishes that version on gh-pages.
-if get(ENV, "DSEAMS_DEPLOY_DOCS", "") == "true"
-    # cname writes the CNAME file on gh-pages, which keeps the Pages
-    # custom domain julia.dseams.info across deploys.
-    deploydocs(; repo = "github.com/d-SEAMS/Dseams.jl.git", devbranch = "main", cname = "julia.dseams.info")
-end

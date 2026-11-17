@@ -17,6 +17,7 @@ DESCRIPTION = (
 DOI = "https://doi.org/10.1021/acs.jcim.0c00031"
 REPOSITORY = "https://github.com/d-SEAMS/Dseams.jl"
 SITE_NAME = "Dseams.jl documentation"
+SOCIAL_IMAGE = "https://dseams.info/images/og-dseams.png"
 START = "<!-- dseams-seo:start -->"
 END = "<!-- dseams-seo:end -->"
 
@@ -99,9 +100,11 @@ def metadata(title, description, canonical, sitemap):
             f'<meta property="og:title" content="{title}">',
             f'<meta property="og:description" content="{description}">',
             f'<meta property="og:url" content="{canonical}">',
+            f'<meta property="og:image" content="{SOCIAL_IMAGE}">',
             '<meta name="twitter:card" content="summary">',
             f'<meta name="twitter:title" content="{title}">',
             f'<meta name="twitter:description" content="{description}">',
+            f'<meta name="twitter:image" content="{SOCIAL_IMAGE}">',
             '<script type="application/ld+json">'
             + json.dumps(graph, ensure_ascii=False, separators=(",", ":"))
             + "</script>",
@@ -178,6 +181,11 @@ def apply(root, base_url):
     ElementTree.ElementTree(sitemap).write(
         root / "sitemap.xml", encoding="utf-8", xml_declaration=True
     )
+    (root / "robots.txt").write_text(
+        "User-agent: *\nAllow: /\n"
+        f"Sitemap: {canonical_url(base_url, Path('sitemap.xml'))}\n",
+        encoding="utf-8",
+    )
 
 
 def attribute(text, element, key, value):
@@ -186,6 +194,11 @@ def attribute(text, element, key, value):
         text,
         re.I,
     )
+
+
+def content(tag):
+    match = re.search(r'\bcontent\s*=\s*["\']([^"\']*)', tag.group(0), re.I)
+    return html.unescape(match.group(1)).strip() if match else ""
 
 
 def check(root):
@@ -203,11 +216,16 @@ def check(root):
         canonical = attribute(text, "link", "rel", "canonical")
         og = [
             attribute(text, "meta", "property", name)
-            for name in ("og:title", "og:description", "og:url")
+            for name in ("og:title", "og:description", "og:url", "og:image")
         ]
         twitter = [
             attribute(text, "meta", "name", name)
-            for name in ("twitter:card", "twitter:title", "twitter:description")
+            for name in (
+                "twitter:card",
+                "twitter:title",
+                "twitter:description",
+                "twitter:image",
+            )
         ]
         missing = []
         if not title or not re.sub(r"<[^>]+>", "", title.group(1)).strip():
@@ -216,9 +234,9 @@ def check(root):
             missing.append("description")
         if not canonical:
             missing.append("canonical")
-        if not all(og):
+        if not all(og) or not all(content(tag) for tag in og if tag):
             missing.append("Open Graph tags")
-        if not all(twitter):
+        if not all(twitter) or not all(content(tag) for tag in twitter if tag):
             missing.append("Twitter tags")
         if DOI not in text or '"SoftwareApplication"' not in text or '"SoftwareSourceCode"' not in text:
             missing.append("structured data")
@@ -247,6 +265,24 @@ def check(root):
                 )
     if not (root / "sitemap.xml").is_file():
         errors.append("missing sitemap.xml")
+    robots = root / "robots.txt"
+    if not robots.is_file():
+        errors.append("missing robots.txt")
+    else:
+        robots_text = robots.read_text(encoding="utf-8")
+        if not re.search(
+            r"^Sitemap: https://julia\.dseams\.info/(?:[^/\s]+/)?sitemap\.xml$",
+            robots_text,
+            re.M,
+        ):
+            errors.append("robots.txt has no custom-domain sitemap")
+    index = root / "index.html"
+    if index.is_file():
+        index_text = index.read_text(encoding="utf-8", errors="replace")
+        if len(index_text.encode("utf-8")) < 1000:
+            errors.append("root index.html is an empty deployment shell")
+        if re.search(r"<meta\b[^>]*http-equiv\s*=\s*['\"]?refresh", index_text, re.I):
+            errors.append("root index.html is a meta-refresh deployment shell")
     if errors:
         raise ValueError("\n".join(errors))
     print(f"SEO metadata ok ({len(pages)} HTML pages)")
@@ -256,7 +292,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=("apply", "check"))
     parser.add_argument("root", type=Path)
-    parser.add_argument("--base-url", default="https://julia.dseams.info/dev/")
+    parser.add_argument("--base-url", default="https://julia.dseams.info/")
     args = parser.parse_args()
     try:
         if args.command == "apply":
