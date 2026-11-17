@@ -212,8 +212,8 @@ def href(tag):
     return html.unescape(match.group(1)).strip() if match else ""
 
 
-def check(root, base_url):
-    pages = sorted(root.rglob("*.html"))
+def check(root, base_url, pages=None):
+    pages = sorted(root.rglob("*.html") if pages is None else pages)
     if not pages:
         raise ValueError(f"no HTML pages found in {root}")
     titles = {}

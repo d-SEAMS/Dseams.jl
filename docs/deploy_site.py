@@ -82,6 +82,29 @@ def validate_site(root, base_url):
         fail(f"{root} has no {expected} robots directive")
 
 
+def validate_deployment(root):
+    manifest = root / MANIFEST
+    if not manifest.is_file():
+        fail(f"{root} has no root file manifest")
+    entries = json.loads(manifest.read_text(encoding="utf-8"))
+    root_pages = [
+        root / entry for entry in entries if Path(entry).suffix.lower() == ".html"
+    ]
+    seo.check(root, f"https://{CNAME}/", root_pages)
+    checked = set(root_pages)
+    for path in root.iterdir():
+        if path.is_dir() and re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", path.name):
+            pages = sorted(path.rglob("*.html"))
+            seo.check(path, f"https://{CNAME}/{path.name}/", pages)
+            checked.update(pages)
+    all_pages = set(root.rglob("*.html"))
+    if checked != all_pages:
+        missed = ", ".join(
+            path.relative_to(root).as_posix() for path in sorted(all_pages - checked)
+        )
+        fail(f"unvalidated HTML pages: {missed}")
+
+
 def deploy_root(source, destination):
     base_url = f"https://{CNAME}/"
     validate_site(source, base_url)
@@ -111,10 +134,7 @@ def deploy_root(source, destination):
         json.dumps(source_files(source), indent=2) + "\n", encoding="utf-8"
     )
     (destination / "CNAME").write_text(CNAME + "\n", encoding="utf-8")
-    validate_site(source, base_url)
-    index = destination / "index.html"
-    if index.read_bytes() != (source / "index.html").read_bytes():
-        fail(f"{index} does not match the Documenter build")
+    validate_deployment(destination)
 
 
 def deploy_tag(source, destination, version):
@@ -132,7 +152,7 @@ def deploy_tag(source, destination, version):
     (destination / "CNAME").write_text(CNAME + "\n", encoding="utf-8")
     validate_site(target, base_url)
     if (destination / "index.html").is_file():
-        validate_site(destination, f"https://{CNAME}/")
+        validate_deployment(destination)
 
 
 def main():
