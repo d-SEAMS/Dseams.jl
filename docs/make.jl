@@ -55,10 +55,20 @@ makedocs(;
         prettyurls = get(ENV, "CI", "") == "true",
         edit_link = "main",
         canonical = canonical_root,
+        footer = nothing,
+        assets = [
+            "assets/dseams/dseams-tokens.css",
+            "assets/dseams/dseams-family.css",
+            "assets/dseams/dseams-documenter.css",
+        ],
     ),
     repo = PublishedRemote(),
     pages = ["Home" => "index.md", "Examples" => "examples.md", "API" => "api.md"],
 )
+
+# The d-SEAMS family strip, vendored scripts and fonts: no page asks a CDN for anything.
+include(joinpath(docsdir, "postprocess.jl"))
+dseams_postprocess(joinpath(docsdir, "build"), docsdir)
 
 # llms.txt beside index.html. seo.py points its manual links at
 # canonical_root, and writes the sitemap and robots.txt from that base.

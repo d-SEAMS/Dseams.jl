@@ -1,0 +1,447 @@
+/* d-SEAMS family look for Documenter.jl (Bulma based). Load after the Documenter theme css. */
+
+html body {
+  font-family: var(--ds-font-sans);
+  font-size: 16px;
+  line-height: var(--ds-leading);
+  color: var(--ds-text);
+  background: var(--ds-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+html:not(.dseams) #documenter {
+  padding-top: var(--ds-family-h);
+}
+
+html:not(.dseams) #documenter .docs-main {
+  background: var(--ds-bg);
+}
+
+html:not(.dseams) #documenter .docs-main .docs-navbar {
+  top: var(--ds-family-h);
+}
+
+/* Sidebar */
+html:not(.dseams) #documenter .docs-sidebar {
+  top: var(--ds-family-h);
+  height: calc(100vh - var(--ds-family-h));
+  background: var(--ds-bg-subtle);
+  border-right: 1px solid var(--ds-border);
+  color: var(--ds-text);
+  font-family: var(--ds-font-sans);
+}
+
+html:not(.dseams) #documenter .docs-sidebar .docs-logo {
+  padding: 18px 16px 4px;
+}
+
+html:not(.dseams) #documenter .docs-sidebar .docs-logo > img {
+  max-height: 64px;
+  width: auto;
+}
+
+html:not(.dseams) #documenter .docs-sidebar .docs-package-name {
+  border-bottom: 1px solid var(--ds-border);
+  background: transparent;
+  padding: 0.5rem 1rem 0.9rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+html:not(.dseams) #documenter .docs-sidebar .docs-package-name a,
+html:not(.dseams) #documenter .docs-sidebar .docs-package-name a:hover {
+  color: var(--ds-ink);
+}
+
+html:not(.dseams) #documenter .docs-sidebar .docs-search-query {
+  background: var(--ds-bg);
+  border: 1px solid var(--ds-border-strong);
+  border-radius: var(--ds-radius);
+  color: var(--ds-muted);
+  font-family: var(--ds-font-sans);
+  width: calc(100% - 2rem);
+  height: 2.2rem;
+  margin: 0.8rem 1rem;
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu {
+  font-size: 0.95rem;
+  padding: 0 0.5rem 1rem;
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu a.tocitem {
+  color: var(--ds-text);
+  border-radius: var(--ds-radius-sm);
+  padding: 0.35rem 0.75rem;
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu a.tocitem:hover {
+  background: var(--ds-bg-hover);
+  color: var(--ds-link-hover);
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu li.is-active {
+  border: 0;
+  background: transparent;
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu li.is-active > a.tocitem {
+  background: var(--ds-primary-wash);
+  color: var(--ds-link);
+  font-weight: 600;
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu ul.internal a.tocitem {
+  color: var(--ds-muted);
+  font-size: 0.9rem;
+}
+
+/* Top bar */
+html:not(.dseams) #documenter .docs-main header.docs-navbar {
+  background: var(--ds-bg);
+  border-bottom: 1px solid var(--ds-border);
+  box-shadow: none;
+  font-family: var(--ds-font-sans);
+}
+
+html:not(.dseams) #documenter .docs-main header.docs-navbar .breadcrumb a,
+html:not(.dseams) #documenter .docs-main header.docs-navbar a.docs-navbar-link {
+  color: var(--ds-muted);
+}
+
+html:not(.dseams) #documenter .docs-main header.docs-navbar .breadcrumb li.is-active a,
+html:not(.dseams) #documenter .docs-main header.docs-navbar a.docs-navbar-link:hover {
+  color: var(--ds-ink);
+}
+
+/* Reading column */
+html:not(.dseams) #documenter .docs-main > article.content {
+  max-width: 52rem;
+  padding: 2rem 2rem 3rem;
+  margin: 0 auto;
+  color: var(--ds-text);
+  font-size: 1rem;
+  line-height: var(--ds-leading);
+}
+
+html:not(.dseams) #documenter .content h1,
+html:not(.dseams) #documenter .content h2,
+html:not(.dseams) #documenter .content h3,
+html:not(.dseams) #documenter .content h4 {
+  font-family: var(--ds-font-sans);
+  color: var(--ds-ink);
+  letter-spacing: var(--ds-h-tracking);
+  line-height: var(--ds-h-leading);
+  font-weight: var(--ds-h-weight);
+}
+
+html:not(.dseams) #documenter .content h1 {
+  font-size: var(--ds-h1);
+  font-weight: var(--ds-h1-weight);
+  margin: 0 0 1.25rem;
+}
+
+html:not(.dseams) #documenter .content h2 {
+  font-size: var(--ds-h2);
+  margin: 2.4rem 0 0.9rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--ds-border);
+}
+
+html:not(.dseams) #documenter .content h3 {
+  font-size: var(--ds-h3);
+  margin: 1.8rem 0 0.6rem;
+}
+
+html:not(.dseams) #documenter .content h1 a.docs-heading-anchor,
+html:not(.dseams) #documenter .content h2 a.docs-heading-anchor,
+html:not(.dseams) #documenter .content h3 a.docs-heading-anchor,
+html:not(.dseams) #documenter .content h4 a.docs-heading-anchor,
+html:not(.dseams) #documenter .content h1 a.docs-heading-anchor:hover,
+html:not(.dseams) #documenter .content h2 a.docs-heading-anchor:hover,
+html:not(.dseams) #documenter .content h3 a.docs-heading-anchor:hover {
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+html:not(.dseams) #documenter .content a {
+  color: var(--ds-link);
+}
+
+html:not(.dseams) #documenter .content a:hover {
+  color: var(--ds-link-hover);
+  text-decoration: underline;
+}
+
+html:not(.dseams) #documenter .content p,
+html:not(.dseams) #documenter .content li {
+  line-height: var(--ds-leading);
+}
+
+/* Code */
+html:not(.dseams) #documenter code,
+html:not(.dseams) #documenter pre,
+html:not(.dseams) #documenter kbd {
+  font-family: var(--ds-font-mono);
+}
+
+html:not(.dseams) #documenter .content code {
+  background: var(--ds-inline-code-bg);
+  color: var(--ds-inline-code-text);
+  border-radius: var(--ds-radius-sm);
+  padding: 0.12em 0.38em;
+  font-size: 0.88em;
+}
+
+html:not(.dseams) #documenter .content pre {
+  background: var(--ds-code-bg);
+  border: 1px solid var(--ds-code-border);
+  border-radius: var(--ds-radius);
+  color: var(--ds-code-text);
+  padding: 1rem 1.2rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+html:not(.dseams) #documenter .content pre code,
+html:not(.dseams) #documenter .content pre code.hljs {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-size: inherit;
+}
+
+html:not(.dseams) #documenter .hljs-keyword,
+html:not(.dseams) #documenter .hljs-built_in,
+html:not(.dseams) #documenter .hljs-literal {
+  color: var(--ds-syn-keyword);
+}
+
+html:not(.dseams) #documenter .hljs-string,
+html:not(.dseams) #documenter .hljs-regexp,
+html:not(.dseams) #documenter .hljs-subst {
+  color: var(--ds-syn-string);
+}
+
+html:not(.dseams) #documenter .hljs-number,
+html:not(.dseams) #documenter .hljs-symbol {
+  color: var(--ds-syn-number);
+}
+
+html:not(.dseams) #documenter .hljs-comment {
+  color: var(--ds-syn-comment);
+  font-style: italic;
+}
+
+html:not(.dseams) #documenter .hljs-title,
+html:not(.dseams) #documenter .hljs-function,
+html:not(.dseams) #documenter .hljs-type {
+  color: var(--ds-syn-function);
+}
+
+html:not(.dseams) #documenter .hljs-meta,
+html:not(.dseams) #documenter .hljs-doctag {
+  color: var(--ds-syn-type);
+}
+
+/* Admonitions */
+html:not(.dseams) #documenter .admonition {
+  background: var(--ds-note-bg);
+  border: 1px solid var(--ds-border);
+  border-left: 4px solid var(--ds-note);
+  border-radius: var(--ds-radius);
+  color: var(--ds-text);
+  box-shadow: none;
+}
+
+html:not(.dseams) #documenter .admonition > .admonition-header {
+  background: transparent;
+  color: var(--ds-note);
+  font-weight: 600;
+  border-bottom: 0;
+}
+
+html:not(.dseams) #documenter .admonition > .admonition-body {
+  color: var(--ds-text);
+}
+
+html:not(.dseams) #documenter .admonition.is-success {
+  background: var(--ds-tip-bg);
+  border-left-color: var(--ds-tip);
+}
+
+html:not(.dseams) #documenter .admonition.is-success > .admonition-header {
+  color: var(--ds-tip);
+}
+
+html:not(.dseams) #documenter .admonition.is-warning {
+  background: var(--ds-warn-bg);
+  border-left-color: var(--ds-warn);
+}
+
+html:not(.dseams) #documenter .admonition.is-warning > .admonition-header {
+  color: var(--ds-warn);
+}
+
+html:not(.dseams) #documenter .admonition.is-danger {
+  background: var(--ds-danger-bg);
+  border-left-color: var(--ds-danger);
+}
+
+html:not(.dseams) #documenter .admonition.is-danger > .admonition-header {
+  color: var(--ds-danger);
+}
+
+/* Docstrings */
+html:not(.dseams) #documenter .docstring {
+  background: var(--ds-bg);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius);
+  box-shadow: none;
+  margin-bottom: 1.2rem;
+}
+
+html:not(.dseams) #documenter .docstring > summary,
+html:not(.dseams) #documenter .docstring > header {
+  background: var(--ds-bg-subtle);
+  border-bottom: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius) var(--ds-radius) 0 0;
+  color: var(--ds-ink);
+  padding: 0.6rem 1rem;
+}
+
+html:not(.dseams) #documenter .docstring > section {
+  border-top: 0;
+  padding: 0.8rem 1.1rem 0.6rem;
+}
+
+html:not(.dseams) #documenter .docstring .docstring-binding {
+  font-family: var(--ds-font-mono);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+html:not(.dseams) #documenter .docstring .docstring-category {
+  color: var(--ds-accent-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+html:not(.dseams) #documenter .docstring a.docs-sourcelink {
+  color: var(--ds-faint);
+  font-size: 0.8rem;
+}
+
+/* Tables */
+html:not(.dseams) #documenter .content table {
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius);
+  font-size: 0.95rem;
+}
+
+html:not(.dseams) #documenter .content table th {
+  background: var(--ds-bg-subtle);
+  color: var(--ds-ink);
+  border-color: var(--ds-border);
+}
+
+html:not(.dseams) #documenter .content table td {
+  border-color: var(--ds-border);
+  color: var(--ds-text);
+}
+
+/* Footer links and media */
+html:not(.dseams) #documenter nav.docs-footer {
+  border-top: 1px solid var(--ds-border);
+  color: var(--ds-muted);
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 1.5rem 2rem 3rem;
+}
+
+html:not(.dseams) #documenter nav.docs-footer a {
+  color: var(--ds-link);
+}
+
+html:not(.dseams) #documenter .content iframe {
+  max-width: 100%;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius);
+}
+
+/* Settings dialog */
+html:not(.dseams) #documenter-settings .modal-card {
+  font-family: var(--ds-font-sans);
+}
+
+@media screen and (max-width: 1055px) {
+  html:not(.dseams) #documenter .docs-main > article.content {
+    padding: 1.4rem 1.1rem 2.4rem;
+  }
+
+  html:not(.dseams) #documenter nav.docs-footer {
+    padding: 1.2rem 1.1rem 2.4rem;
+  }
+}
+
+@media screen and (min-width: 1056px) {
+  html:not(.dseams) #documenter .docs-sidebar {
+    width: 18rem;
+  }
+
+  html:not(.dseams) #documenter .docs-main {
+    margin-left: 18rem;
+    max-width: none;
+    width: auto;
+  }
+
+  html:not(.dseams) #documenter .docs-main > article.content,
+  html:not(.dseams) #documenter nav.docs-footer {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu li,
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu ul.internal,
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu ul.internal li,
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu li.is-active ul.internal {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu li > a.tocitem,
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu ul.internal li > a.tocitem {
+  background: transparent !important;
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu li > a.tocitem:hover {
+  background: var(--ds-bg-hover) !important;
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu li.is-active > a.tocitem {
+  background: var(--ds-primary-wash) !important;
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu > li > a.tocitem {
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu ul.internal {
+  margin: 0 0 0.4rem 0.8rem;
+  padding-left: 0.4rem;
+  border-left: 1px solid var(--ds-border);
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu ul.internal a.tocitem {
+  font-weight: 400;
+}
+
+html:not(.dseams) #documenter .docs-sidebar ul.docs-menu a.tocitem::before {
+  display: none;
+}
