@@ -113,13 +113,13 @@ jobs:
             python3 docs/deploy_site.py docs/build "$RUNNER_TEMP/docs-site" --root
           fi
       - name: Check out the published site
-        if: matrix.julia == '1' && github.repository == 'd-SEAMS/Dseams.jl' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        if: matrix.julia == '1' && github.repository == 'd-SEAMS/Dseams.jl' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: gh-pages
           path: docs-site
       - name: Publish crawlable documentation
-        if: matrix.julia == '1' && github.repository == 'd-SEAMS/Dseams.jl' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        if: matrix.julia == '1' && github.repository == 'd-SEAMS/Dseams.jl' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         run: |
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then
             python3 docs/deploy_site.py docs/build docs-site --version "$GITHUB_REF_NAME"
@@ -156,7 +156,7 @@ jobs:
   # test job and are not fetched from GitHub again.
   live:
     needs: test
-    if: github.repository == 'd-SEAMS/Dseams.jl' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    if: github.repository == 'd-SEAMS/Dseams.jl' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
