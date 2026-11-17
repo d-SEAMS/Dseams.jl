@@ -79,7 +79,7 @@ julia --project=. -e 'using Pkg; Pkg.test()'
 julia --project=docs docs/make.jl
 ```
 
-CI does the same against the seams-core commit pinned as
+CI does the same against seams-core tag `v2.14.0`, pinned as
 `SEAMS_CORE_REF` in `.github/workflows/CI.yml`.
 
 ## Release order

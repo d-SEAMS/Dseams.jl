@@ -26,8 +26,8 @@ registered.
 ## The engine library
 
 `libseams_jll` provides the engine for Linux (glibc and musl; x86_64,
-aarch64, powerpc64le, riscv64) and macOS once the recipe in seams-core's
-`packaging/yggdrasil/L/libseams` is merged into Yggdrasil. Neither it nor
+aarch64, powerpc64le, riscv64) and macOS once the recipe pinned to
+seams-core tag `v2.14.0` is merged into Yggdrasil. Neither it nor
 Dseams is in the General registry yet. Until then `dev/develop_jll.jl`
 develops a stand-in `libseams_jll` with no binaries, and the engine is a
 local build of [seams-core](https://github.com/d-SEAMS/seams-core). To use

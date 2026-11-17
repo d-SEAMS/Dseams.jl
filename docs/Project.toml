@@ -6,3 +6,4 @@ libseams_jll = "7f1e8526-9a03-57ab-a5c6-46114804ed15"
 [compat]
 Documenter = "1"
 julia = "1.10"
+libseams_jll = "=2.14.0"

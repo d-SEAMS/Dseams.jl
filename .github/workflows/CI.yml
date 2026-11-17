@@ -22,11 +22,11 @@ permissions:
   contents: write
 
 env:
-  # release/2.14.0 on HaoZeke/seams-core. Becomes the v2.14.0 tag on
-  # d-SEAMS/seams-core: set SEAMS_CORE_REPO to d-SEAMS/seams-core and
-  # SEAMS_CORE_REF to v2.14.0 once that tag exists.
-  SEAMS_CORE_REPO: HaoZeke/seams-core
-  SEAMS_CORE_REF: 628b0af94b4d3bf52426708a0d08436027c8e4fa
+  # Annotated tag v2.14.0 on d-SEAMS/seams-core (tag object
+  # a54eee70f37da364f7abcbb49842b90b41d6ed07), which points at
+  # acc8bbc803f55bac39493c85300f87a8ce302829. Checkout the tag, not a branch.
+  SEAMS_CORE_REPO: d-SEAMS/seams-core
+  SEAMS_CORE_REF: v2.14.0
 
 jobs:
   test:

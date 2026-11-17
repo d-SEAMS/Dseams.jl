@@ -37,9 +37,9 @@ Dseams calls two libraries from seams-core:
 General, `julia --project=. dev/develop_jll.jl` develops the stand-in and
 the engine is a local seams-core build.
 
-CI builds seams-core at the commit pinned as `SEAMS_CORE_REF` in
-`.github/workflows/CI.yml`. Move that pin to the seams-core release tag
-that matches `[compat] libseams_jll`.
+CI builds seams-core at the tag pinned as `SEAMS_CORE_REF` in
+`.github/workflows/CI.yml`. That pin is the seams-core release tag
+`v2.14.0`, which matches `[compat] libseams_jll`.
 
 A change to analysis results, the C API or the C ABI goes to seams-core,
 with its tests there. This repository then follows the released engine:
