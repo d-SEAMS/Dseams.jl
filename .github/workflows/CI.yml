@@ -79,6 +79,8 @@ jobs:
         run: |
           julia --project=docs docs/make.jl
           julia --project=lib/Seams/docs lib/Seams/docs/make.jl
+      - name: Documentation SEO
+        run: python3 docs/seo.py check docs/build
       # README and the built manual. The published /dev URL is mapped to
       # the build, so a page this commit adds resolves before it deploys.
       # GitHub answers some blob pages with 503 under concurrent requests;

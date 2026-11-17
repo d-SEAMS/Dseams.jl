@@ -39,17 +39,23 @@ function Documenter.Remotes.fileurl(::PublishedRemote, ::AbstractString, filenam
     return "https://github.com/d-SEAMS/Dseams.jl/blob/main/$(filename)"
 end
 
+version_dir = startswith(get(ENV, "GITHUB_REF", ""), "refs/tags/") ?
+              get(ENV, "GITHUB_REF_NAME", "dev") : "dev"
+canonical_root = get(
+    ENV,
+    "DSEAMS_DOCS_URL",
+    "https://julia.dseams.info/$(version_dir)/",
+)
+
 makedocs(;
-    sitename = "Dseams",
+    sitename = "Dseams.jl Molecular Trajectory Analysis",
     modules = [Dseams],
     checkdocs = :exports,
     doctest = true,
-    # The manual is served at julia.dseams.info; canonical links name /dev/,
-    # the version built from main.
     format = Documenter.HTML(;
         prettyurls = get(ENV, "CI", "") == "true",
         edit_link = "main",
-        canonical = "https://julia.dseams.info/dev/",
+        canonical = canonical_root,
     ),
     repo = PublishedRemote(),
     pages = ["Home" => "index.md", "Examples" => "examples.md", "API" => "api.md"],
@@ -57,6 +63,7 @@ makedocs(;
 
 # llms.txt at the site root, next to index.html.
 cp(joinpath(docsdir, "..", "llms.txt"), joinpath(docsdir, "build", "llms.txt"); force = true)
+run(`python3 $(joinpath(docsdir, "seo.py")) apply $(joinpath(docsdir, "build")) --base-url $(canonical_root)`)
 
 # CI sets DSEAMS_DEPLOY_DOCS on one job, so a push to main publishes /dev
 # and a vX.Y.Z tag publishes that version on gh-pages.
