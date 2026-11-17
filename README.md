@@ -14,7 +14,7 @@ chill_plus(f; graph = "cutoff").counts["hexagonal"]   # 128
 ## Documentation
 
 - Manual, with the examples and the API reference:
-  <https://d-seams.github.io/Dseams.jl/dev/>
+  <https://julia.dseams.info/dev/>
 - The Julia chapter of the d-SEAMS book:
   <https://docs.dseams.info/stable/julia.html>
 - A video walk-through of the package:

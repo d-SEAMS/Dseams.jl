@@ -44,7 +44,13 @@ makedocs(;
     modules = [Dseams],
     checkdocs = :exports,
     doctest = true,
-    format = Documenter.HTML(; prettyurls = get(ENV, "CI", "") == "true", edit_link = "main"),
+    # The manual is served at julia.dseams.info; canonical links name /dev/,
+    # the version built from main.
+    format = Documenter.HTML(;
+        prettyurls = get(ENV, "CI", "") == "true",
+        edit_link = "main",
+        canonical = "https://julia.dseams.info/dev/",
+    ),
     repo = PublishedRemote(),
     pages = ["Home" => "index.md", "Examples" => "examples.md", "API" => "api.md"],
 )
@@ -55,5 +61,7 @@ cp(joinpath(docsdir, "..", "llms.txt"), joinpath(docsdir, "build", "llms.txt"); 
 # CI sets DSEAMS_DEPLOY_DOCS on one job, so a push to main publishes /dev
 # and a vX.Y.Z tag publishes that version on gh-pages.
 if get(ENV, "DSEAMS_DEPLOY_DOCS", "") == "true"
-    deploydocs(; repo = "github.com/d-SEAMS/Dseams.jl.git", devbranch = "main")
+    # cname writes the CNAME file on gh-pages, which keeps the Pages
+    # custom domain julia.dseams.info across deploys.
+    deploydocs(; repo = "github.com/d-SEAMS/Dseams.jl.git", devbranch = "main", cname = "julia.dseams.info")
 end
