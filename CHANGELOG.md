@@ -11,6 +11,8 @@ and the version follows the d-SEAMS engine release in `libseams_jll`.
 
 - `read_frame` throws `SeamsError` for a frame below 1 or past the last
   frame of the file. The engine answered both with a frame of no atoms.
+- `steinhardt` throws `SeamsError` for a degree other than 3, 4, 6, 8, or
+  12. The engine answered one with a vector of zeros.
 - `llms.txt` links to the manual at the site root, the same base the
   sitemap and `robots.txt` use.
 

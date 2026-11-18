@@ -412,11 +412,13 @@ end
 """
     steinhardt(frame, order_l; cutoff=3.5, type=0, graph=nothing)
 
-Local Steinhardt parameter. `order_l` is 3, 4, 6, 8, or 12. Omitting
-`graph` uses the cutoff shell. `"mutual"` is the four nearest neighbours
+Local Steinhardt parameter. `order_l` is 3, 4, 6, 8, or 12, and any other
+degree throws [`SeamsError`](@ref). Omitting `graph` uses the cutoff shell.
+`"mutual"` is the four nearest neighbours
 inside `cutoff + 1.5`.
 """
 function steinhardt(frame::Frame, order_l::Integer; cutoff::Real = 3.5, type::Integer = 0, graph::Union{Nothing,AbstractString} = nothing)
+    order_l in (3, 4, 6, 8, 12) || throw(SeamsError("order is 3, 4, 6, 8, or 12, got $(order_l)"))
     n = nop(frame)
     ql = Vector{Cdouble}(undef, n)
     qlbar = Vector{Cdouble}(undef, n)
