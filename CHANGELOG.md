@@ -13,6 +13,9 @@ and the version follows the d-SEAMS engine release in `libseams_jll`.
   frame of the file. The engine answered both with a frame of no atoms.
 - `steinhardt` throws `SeamsError` for a degree other than 3, 4, 6, 8, or
   12. The engine answered one with a vector of zeros.
+- Indexing a `RingHistogram` with a size that has no ring returns 0 in
+  place of throwing `KeyError`, so a frame with no atoms or no ring of
+  that size gives a count.
 - `llms.txt` links to the manual at the site root, the same base the
   sitemap and `robots.txt` use.
 

@@ -197,12 +197,16 @@ function Base.show(io::IO, found::CageScore)
     print(io, "CageScore(hex ", found.n_ih, ", cubic ", found.n_ic, ", both ", found.n_both, ", water ", found.n_water, ")")
 end
 
-"""Primitive-ring histogram. `counts[size]` is the number of rings of that size."""
+"""
+Primitive-ring histogram. `counts` holds the sizes that occur, and
+`hist[size]` is the number of rings of that size, 0 for a size that does
+not occur. An empty frame, or one with no ring, gives an empty `counts`.
+"""
 struct RingHistogram
     counts::Dict{Int,Int}
 end
 
-Base.getindex(hist::RingHistogram, size::Integer) = hist.counts[size]
+Base.getindex(hist::RingHistogram, size::Integer) = get(hist.counts, Int(size), 0)
 
 function Base.show(io::IO, hist::RingHistogram)
     print(io, "RingHistogram(")
@@ -389,7 +393,10 @@ end
 """
     primitive_rings(frame; cutoff=3.5, type=0, graph="mutual", max_depth=6)
 
-Histogram of primitive rings. Index with the ring size: `rings[6]`.
+Histogram of primitive rings. Index with the ring size: `rings[6]`, which
+is 0 when there is no such ring. `max_depth` is at least 3, else
+[`SeamsError`](@ref). A frame with no atoms or no ring gives an empty
+histogram.
 """
 function primitive_rings(frame::Frame; cutoff::Real = 3.5, type::Integer = 0, graph::AbstractString = "mutual", max_depth::Integer = 6)
     counts = zeros(Cint, max_depth + 1)
