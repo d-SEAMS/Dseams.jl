@@ -97,6 +97,8 @@ if !isempty(root)
     end
 end
 
+include("emptyframes.jl")
+
 include("examples.jl")
 
 # seams.h against the C++ census, when a seams-core build names the oracle
