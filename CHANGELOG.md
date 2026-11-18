@@ -9,6 +9,8 @@ and the version follows the d-SEAMS engine release in `libseams_jll`.
 
 ### Fixed
 
+- `read_frame` throws `SeamsError` for a frame below 1 or past the last
+  frame of the file. The engine answered both with a frame of no atoms.
 - `llms.txt` links to the manual at the site root, the same base the
   sitemap and `robots.txt` use.
 

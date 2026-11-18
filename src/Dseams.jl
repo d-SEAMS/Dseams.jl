@@ -259,9 +259,21 @@ end
 
 Read one frame. `frame` is 1-based. `type = 0` guesses oxygen. A positive
 type keeps that species. A negative type keeps every atom.
+
+A frame that holds no atoms, or none of the kept `type`, is a valid frame
+with `nop(frame) == 0`, and every analysis accepts it. A `frame` below 1,
+or past the last one in the file, throws [`SeamsError`](@ref); neither
+gives an empty frame.
 """
 function read_frame(path::AbstractString; frame::Integer = 1, type::Integer = 0)
     _need_file(path)
+    frame >= 1 || throw(SeamsError("frame index starts at 1, got $(frame)"))
+    # The engine answers a frame past the end of a LAMMPS dump with an empty
+    # frame, which a zero-atom frame in the file also is, and a later
+    # nframes of that file then counts the frame that was asked for. A count
+    # of 0 is a format the engine does not count, such as .con.
+    count = nframes(path)
+    count == 0 || frame <= count || throw(SeamsError("frame $(frame) is past the last frame in this file"))
     ptr = ccall(
         dlsym(_so(), :seams_frame_read),
         Ptr{Cvoid},
