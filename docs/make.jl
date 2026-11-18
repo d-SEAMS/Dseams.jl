@@ -60,6 +60,7 @@ makedocs(;
     pages = ["Home" => "index.md", "Examples" => "examples.md", "API" => "api.md"],
 )
 
-# llms.txt at the site root, next to index.html.
+# llms.txt beside index.html. seo.py points its manual links at
+# canonical_root, and writes the sitemap and robots.txt from that base.
 cp(joinpath(docsdir, "..", "llms.txt"), joinpath(docsdir, "build", "llms.txt"); force = true)
 run(`python3 $(joinpath(docsdir, "seo.py")) apply $(joinpath(docsdir, "build")) --base-url $(canonical_root)`)

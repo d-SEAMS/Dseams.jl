@@ -7,6 +7,11 @@ and the version follows the d-SEAMS engine release in `libseams_jll`.
 
 ## [Unreleased]
 
+### Fixed
+
+- `llms.txt` links to the manual at the site root, the same base the
+  sitemap and `robots.txt` use.
+
 ## [2.14.0] - 2026-11-17
 
 ### Changed

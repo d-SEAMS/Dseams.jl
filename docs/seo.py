@@ -31,6 +31,62 @@ def canonical_url(base_url, relative):
     return base_url.rstrip("/") + "/" + quote(path, safe="/.-~")
 
 
+# Documenter used to publish the manual at /dev/. Main is the site root and a
+# tag is /vX.Y.Z/. llms.txt, the sitemap and robots.txt all use that base.
+DOCS_PREFIX = re.compile(
+    r"https://julia\.dseams\.info/(?:dev/|v[0-9]+\.[0-9]+\.[0-9]+/)?"
+)
+DEV_DOCS = re.compile(
+    r"https://julia\.dseams\.info/(?:v[0-9]+\.[0-9]+\.[0-9]+/)?dev/"
+)
+
+
+def published_base(base_url):
+    return base_url.rstrip("/") + "/"
+
+
+def rewrite_docs_urls(text, base_url):
+    return DOCS_PREFIX.sub(published_base(base_url), text)
+
+
+def publish_llms(root, base_url):
+    path = root / "llms.txt"
+    if not path.is_file():
+        raise ValueError(f"no llms.txt in {root}")
+    rewritten = rewrite_docs_urls(path.read_text(encoding="utf-8"), base_url)
+    if DEV_DOCS.search(rewritten):
+        raise ValueError("llms.txt still links to /dev/")
+    path.write_text(rewritten, encoding="utf-8")
+
+
+def outside_base(url, base):
+    if not url.startswith(base):
+        return True
+    rest = url[len(base) :]
+    return rest.startswith("dev/") or re.match(
+        r"v[0-9]+\.[0-9]+\.[0-9]+/", rest
+    ) is not None
+
+
+def published_url_errors(root, base_url):
+    base = published_base(base_url)
+    errors = []
+    for name in ("llms.txt", "sitemap.xml", "robots.txt"):
+        path = root / name
+        if not path.is_file():
+            if name == "llms.txt":
+                errors.append("missing llms.txt")
+            continue
+        text = path.read_text(encoding="utf-8")
+        if DEV_DOCS.search(text):
+            errors.append(f"{name} still links to /dev/")
+        for url in re.findall(r"https://julia\.dseams\.info/[^\s\"'<>]*", text):
+            url = url.rstrip(").,")
+            if outside_base(url, base):
+                errors.append(f"{name} URL {url} is outside {base}")
+    return errors
+
+
 def page_title(text, relative):
     match = re.search(r"<title\b[^>]*>(.*?)</title\s*>", text, re.I | re.S)
     if match:
@@ -192,6 +248,7 @@ def apply(root, base_url):
         f"Sitemap: {canonical_url(base_url, Path('sitemap.xml'))}\n",
         encoding="utf-8",
     )
+    publish_llms(root, base_url)
 
 
 def attribute(text, element, key, value):
@@ -293,12 +350,14 @@ def check(root, base_url, pages=None):
         errors.append("missing robots.txt")
     else:
         robots_text = robots.read_text(encoding="utf-8")
+        expected_sitemap = canonical_url(base_url, Path("sitemap.xml"))
         if not re.search(
-            r"^Sitemap: https://julia\.dseams\.info/(?:[^/\s]+/)?sitemap\.xml$",
+            rf"^Sitemap: {re.escape(expected_sitemap)}$",
             robots_text,
             re.M,
         ):
             errors.append("robots.txt has no custom-domain sitemap")
+    errors.extend(published_url_errors(root, base_url))
     index = root / "index.html"
     if index.is_file():
         index_text = index.read_text(encoding="utf-8", errors="replace")
