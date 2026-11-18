@@ -301,8 +301,10 @@ nop(frame::Frame) = Int(ccall(dlsym(_so(), :seams_frame_nop), Cint, (Ptr{Cvoid},
     chill_plus(frame; cutoff = 3.5, type = 0, graph = "cutoff")
 
 CHILL+ labels. `graph = "cutoff"` (the default) bonds every pair closer
-than `cutoff`. `graph = "mutual"` keeps the mutual four nearest
-neighbours inside `cutoff + 1.5`.
+than `cutoff`. `graph = "mutual"` bonds the mutual four nearest
+neighbours; `cutoff + 1.5` only sizes the search cells and does not bound
+a bond, so an atom with no neighbour within `cutoff` can still be bonded.
+A frame with no atoms gives empty `labels` and `names` and nine zero counts.
 """
 function chill_plus(frame::Frame; cutoff::Real = 3.5, type::Integer = 0, graph::AbstractString = "cutoff")
     n = nop(frame)
@@ -340,7 +342,8 @@ end
 
 Hexagonal and double-diamond membership. `cage` is 0 water, 1 hexagonal
 only, 2 double-diamond only, 3 both. The four counts are disjoint and
-match `seams cages`. `cutoff` is angstrom.
+match `seams cages`. `cutoff` is angstrom. A frame with no atoms gives an
+empty `cage` and four zero counts.
 """
 function cages(frame::Frame; cutoff::Real = 3.5, type::Integer = 0, k::Integer = 4, graph::AbstractString = "seeded")
     n = nop(frame)
@@ -374,7 +377,9 @@ end
 """
     neighbour_pairs(frame; cutoff=3.5, type=0, graph="cutoff")
 
-Directed pairs in the neighbour list. The self entry is omitted.
+Directed pairs in the neighbour list. The self entry is omitted. A frame
+with no atoms, or no pair within `cutoff`, has 0 pairs. `graph = "mutual"`
+is the four nearest neighbours and is not bounded by `cutoff`.
 """
 function neighbour_pairs(frame::Frame; cutoff::Real = 3.5, type::Integer = 0, graph::AbstractString = "cutoff")
     code = ccall(
@@ -421,8 +426,9 @@ end
 
 Local Steinhardt parameter. `order_l` is 3, 4, 6, 8, or 12, and any other
 degree throws [`SeamsError`](@ref). Omitting `graph` uses the cutoff shell.
-`"mutual"` is the four nearest neighbours
-inside `cutoff + 1.5`.
+`"mutual"` is the four nearest neighbours, not bounded by `cutoff`. An
+atom with an empty shell has `ql` and `qlbar` equal to 0, and a frame with
+no atoms gives empty vectors.
 """
 function steinhardt(frame::Frame, order_l::Integer; cutoff::Real = 3.5, type::Integer = 0, graph::Union{Nothing,AbstractString} = nothing)
     order_l in (3, 4, 6, 8, 12) || throw(SeamsError("order is 3, 4, 6, 8, or 12, got $(order_l)"))
@@ -463,7 +469,8 @@ end
 """
     signature_cages(frame, spec; cutoff=3.5, type=0, graph="cutoff")
 
-Closed cages whose ring census matches `spec`, for example `"512"`.
+Closed cages whose ring census matches `spec`, for example `"512"`. A frame
+with no atoms or no closed cage has 0 cages and 0 atoms.
 """
 function signature_cages(frame::Frame, spec::AbstractString; cutoff::Real = 3.5, type::Integer = 0, graph::AbstractString = "cutoff")
     n_cages = Ref{Cint}(0)
@@ -488,7 +495,8 @@ end
     jump_tau90(first, second, dt=1.0; oxygen_type=1, hydrogen_type=2)
 
 Time for an H-H vector to rotate 90 degrees between two frames.
-Returns `dt` when any water rotates that far, and `NaN` otherwise.
+Returns `dt` when any water rotates that far, and `NaN` otherwise: when
+none does, when a frame has no water, or when `dt` is not positive.
 """
 function jump_tau90(first::Frame, second::Frame, dt::Real = 1.0; oxygen_type::Integer = 1, hydrogen_type::Integer = 2)
     tau = Ref{Cdouble}(0.0)
@@ -511,7 +519,8 @@ end
     symmetry(frame; shell_rmsd=0.12)
 
 Per-atom shell label. 0 is ice Ih, 1 is ice Ic, 2 is stacking disorder,
-and -1 is anything else.
+and -1 is anything else, which includes an atom with no neighbours. A frame
+with no atoms gives an empty vector.
 """
 function symmetry(frame::Frame; shell_rmsd::Real = 0.12)
     n = nop(frame)
@@ -532,6 +541,8 @@ end
     q4_q6(frame; cutoff=3.5, type=0)
 
 Local and Lechner-Dellago q4 and q6 on the cutoff shell. `cutoff` is angstrom.
+An atom with an empty shell has 0 for all four values, and a frame with no
+atoms gives empty vectors.
 """
 function q4_q6(frame::Frame; cutoff::Real = 3.5, type::Integer = 0)
     n = nop(frame)

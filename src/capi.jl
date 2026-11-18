@@ -35,6 +35,9 @@ end
 
 One frame from `seams_system_create`. The finalizer calls `seams_system_destroy`.
 Neighbour, ring, and cage handles copied out of it stay valid after `System` is freed.
+
+A `System` that has not read a frame holds no atoms: `seams_system_count`
+is 0 and every analysis throws [`SeamsError`](@ref).
 """
 mutable struct System
     ptr::Ptr{Cvoid}
@@ -73,7 +76,8 @@ end
     seams_system_read(sys, path, frame=1, type_filter=-1)
 
 Read one frame into `sys`. `frame` is 1-based. A negative filter keeps every atom.
-The previous frame is kept when the call throws [`SeamsError`](@ref).
+The previous frame is kept when the call throws [`SeamsError`](@ref). A frame
+with no atoms, or none of the kept type, is an error, not an empty `System`.
 """
 function seams_system_read(sys::System, path::AbstractString, frame::Integer=1, type_filter::Integer=-1)
     _seams_check(ccall(_seams_sym(:seams_system_read), Cint,
@@ -344,6 +348,8 @@ end
     seams_rings_vertices(sys; cutoff=3.5, max_depth=6, index=0)
 
 Atom indices of one primitive ring. The ring handle is freed before return.
+Throws [`SeamsError`](@ref) when `index` is out of range, which is every
+index when the frame has no ring.
 """
 function seams_rings_vertices(sys::System; cutoff::Real=3.5, max_depth::Integer=6, index::Integer=0)
     out = Ref{Ptr{Cvoid}}(C_NULL)

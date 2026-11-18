@@ -7,6 +7,13 @@ and the version follows the d-SEAMS engine release in `libseams_jll`.
 
 ## [Unreleased]
 
+### Changed
+
+- The docstrings state what an empty frame gives from each analysis, and
+  that the `"mutual"` graph is the four nearest neighbours with no bound
+  from `cutoff + 1.5`, which only sizes the search cells. They said it
+  keeps the neighbours inside `cutoff + 1.5`.
+
 ### Fixed
 
 - `read_frame` throws `SeamsError` for a frame below 1 or past the last
