@@ -1,9 +1,10 @@
 # Dseams
 
 `Dseams.jl` is a Julia front for the [d-SEAMS](https://docs.dseams.info)
-engine. It reads LAMMPS trajectories and exposes the same core analyses:
-CHILL+, primitive rings, cage census, Steinhardt order, shell symmetry,
-and jump reorientation times.
+engine. It reads LAMMPS trajectories and XYZ files (plus PDB, GRO, and
+`.con` when the engine includes chemfiles and `readcon-core`) and exposes
+the same core analyses: CHILL+, primitive rings, cage census, Steinhardt
+order, shell symmetry, and jump reorientation times.
 
 ```julia
 using Dseams
@@ -31,6 +32,28 @@ shows a full session.
 
 This repository also includes `lib/Seams`, a compact example package
 around the lower-level `libseams` C API.
+
+## The engine library
+
+`libseams_jll` provides the engine for Linux (glibc and musl; x86_64,
+aarch64, powerpc64le, riscv64) and macOS once the recipe pinned to
+seams-core tag `v2.14.0` is merged into Yggdrasil. Neither it nor
+Dseams is in the General registry yet. Until then `dev/develop_jll.jl`
+develops a stand-in `libseams_jll` with no binaries, and the engine is a
+local build of [seams-core](https://github.com/d-SEAMS/seams-core). To use
+one, name its `libseams_lang`:
+
+```julia
+Dseams.set_library!("/path/to/seams-core/bbdir/bindings/libseams_lang.so")
+# restart Julia; Dseams.set_library!(nothing) goes back to the JLL
+```
+
+This writes the `libseams_lang` preference to `LocalPreferences.toml`.
+The `SEAMS_LANG_LIB` environment variable takes precedence over the
+preference. With either one set, `libseams_jll` is not loaded.
+
+To replace the whole JLL artifact with an install prefix instead, use
+an `Overrides.toml` in `~/.julia/artifacts`, as for any JLL.
 
 ## Data used in examples
 

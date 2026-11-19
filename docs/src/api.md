@@ -12,6 +12,7 @@ Common starting points:
 
 - `read_frame(path; kwargs...)` to load one frame.
 - `nframes(path)` to inspect trajectory length before analysis.
+- `features()`, `has_chemfiles()`, and `has_readcon()` to check which optional trajectory readers (chemfiles for PDB/GRO/DCD/CIF, `readcon-core` for `.con`) the loaded engine supports.
 - `Dseams.example_path(name)` for bundled demonstration trajectories.
 
 The full exported API is listed below.

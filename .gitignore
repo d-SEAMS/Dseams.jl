@@ -3,3 +3,5 @@ LocalPreferences.toml
 .instantiate.lock
 /docs/build/
 /lib/Seams/docs/build/
+__pycache__/
+*.pyc

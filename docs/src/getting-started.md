@@ -39,7 +39,7 @@ export DSEAMS_ROOT="$CORE"
 ## 4. Run a smoke test
 
 ```bash
-julia --project=. -e 'using Dseams; f=read_frame(Dseams.ice_ih_path(); type=-1); println(chill_plus(f; graph=\"cutoff\").counts[\"hexagonal\"])'
+julia --project=. -e 'using Dseams; f=read_frame(Dseams.ice_ih_path(); type=-1); println(chill_plus(f; graph="cutoff").counts["hexagonal"])'
 ```
 
 Expected output:
@@ -53,4 +53,15 @@ Expected output:
 ```bash
 julia --project=. -e 'using Pkg; Pkg.test()'
 julia --project=docs docs/make.jl
+```
+
+## 6. Check optional readers
+
+Native LAMMPS dumps and XYZ files are always supported. Check whether the loaded engine also includes chemfiles (PDB, GRO, DCD, CIF) and `readcon-core` (`.con`):
+
+```julia
+using Dseams
+features()       # (chemfiles = ..., readcon = ...)
+has_chemfiles()  # true when chemfiles readers are available
+has_readcon()    # true when readcon-core (.con) is available
 ```

@@ -75,18 +75,26 @@ Every exported function has a docstring with a `jldoctest`
 
 - Conventional Commits: `feat:`, `fix:`, `docs:`, `test:`, `ci:`,
   `refactor:`, `chore:`, `style:`, with an optional scope
-  (`fix(docs): ...`). One logical change per commit.
+  (`fix(docs): ...`). One logical change per commit. Checked with
+  `cog check --ignore-merge-commits <base>..HEAD` (`cog.toml`).
 - ASCII punctuation in code, docs and commit messages.
-- `CHANGELOG.md` follows Keep a Changelog. A user-visible change adds a
-  line under `## [Unreleased]` in the same commit. A release renames that
-  section to `## [X.Y.Z] - YYYY-MM-DD`.
+- `CHANGELOG.md` is managed by [towncrier](https://towncrier.readthedocs.io/)
+  (`towncrier.toml`). A user-visible change adds a fragment under
+  `docs/newsfragments/` in the same commit instead of editing `CHANGELOG.md`
+  directly. Preview with `towncrier build --draft`.
 
 ## Releases
 
+The canonical step-by-step release guide is
+[`docs/orgmode/contributing/developer/release.org`](docs/orgmode/contributing/developer/release.org)
+(alongside `index.org`, `testing.org`, and `faq.org` in that directory).
+Versions stay in lockstep with `Project.toml` via `cogapp`
+(`ci/version/files.txt`) and `cog bump` (`cog.toml`, `tag_prefix = "v"`):
+
 1. seams-core tags the engine release, and `libseams_jll` of that version
    is merged into General.
-2. Here, `Project.toml` and `CITATION.cff` have that version,
-   `[compat]` has `libseams_jll = "=X.Y.Z"`,
-   `SEAMS_CORE_REF` names the seams-core tag, and CI is green on `main`.
-3. Run the `Register Dseams` workflow on that commit. TagBot tags `vX.Y.Z`
-   after General merges the registration.
+2. Run tests, docs builds, `cog check`, `python3 -m cogapp --check -I ci/version @ci/version/files.txt`,
+   and `cog bump --version X.Y.Z` (see `docs/orgmode/contributing/developer/release.org`).
+3. Push `main` (without pushing a pre-General tag ahead of TagBot), confirm CI
+   (`test` and `both-libs`) is green, then run the `Register Dseams` workflow.
+   TagBot tags `vX.Y.Z` after General merges the registration.

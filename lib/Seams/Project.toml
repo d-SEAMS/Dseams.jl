@@ -1,6 +1,13 @@
 name = "Seams"
 uuid = "b7e0c1a2-4d55-4a1e-9c3b-6f0a2e8d4c11"
+# [[[cog
+# import tomllib
+# v = globals().get("version") or tomllib.load(open("Project.toml", "rb"))["version"]
+# cog.outl(f'version = "{v}"')
+# ]]]
 version = "2.14.0"
+# [[[end]]]
+description = "Example Julia wrapper over the libseams C API (include/seams.h): CHILL+ and CHILL ice classification, q4/q6 and Steinhardt order parameters, primitive six-rings and ring vertices, hexagonal/double-diamond and signature cages, k-NN neighbours, partial RDF, coordination numbers, hydrogen bonds, axial density, topological fingerprints, contact pairs, domains, prisms, monolayers, site tables, and OpenMP thread controls. Supports LAMMPS and XYZ files, plus chemfiles and readcon-core formats when built into libseams."
 
 [deps]
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"

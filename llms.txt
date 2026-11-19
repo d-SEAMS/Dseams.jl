@@ -1,12 +1,13 @@
 # Dseams.jl
 
-> Dseams is the Julia front for the d-SEAMS engine: CHILL+, primitive rings, ice and clathrate cages, Steinhardt order parameters and shell symmetry on LAMMPS trajectories.
+> Dseams is the Julia front for the d-SEAMS engine: CHILL+, primitive rings, ice and clathrate cages, Steinhardt order parameters and shell symmetry on LAMMPS, XYZ, and optional chemfiles / readcon-core trajectories.
 
 The package is `Dseams`. It calls `libseams_lang`, the C ABI of the d-SEAMS engine, through `ccall`, and gets the library from `libseams_jll` or from a local build named by `SEAMS_LANG_LIB`. Julia 1.10 or newer. The engine, its C API and its documentation site are in d-SEAMS/seams-core; this repository holds only Julia code. Each manual link below is a page of the Documenter site at https://julia.dseams.info/, and the source markdown of each page is under `docs/src` in the repository. Contributor instructions are in the contributing guide at the repository root, next to README.md.
 
 ## Manual
 
 - [Dseams](https://julia.dseams.info/): What Dseams computes, how it relates to Seams, how the engine library is found, and the example data.
+- [Getting started](https://julia.dseams.info/getting-started/): Build the engine, configure Dseams, and run a smoke test.
 - [Examples](https://julia.dseams.info/examples/): The scripts in `examples/`, which the tests run, with the census line each prints.
 - [API](https://julia.dseams.info/api/): Docstrings of every exported function, each with a doctest.
 - [Julia chapter of the book](https://docs.dseams.info/stable/julia.html): The Julia front in the d-SEAMS documentation.

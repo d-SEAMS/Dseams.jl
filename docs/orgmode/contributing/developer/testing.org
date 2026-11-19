@@ -1,0 +1,74 @@
+#+TITLE: Testing
+#+OPTIONS: toc:nil todo:nil num:nil author:nil title:nil
+#+STARTUP: content
+
+* Testing
+
+** Running Tests Without a Local Engine Checkout
+
+When only the package directory is checked out, bundled trajectories in
+=data/= and fixtures in =test/fixtures/= still exercise the public API:
+
+#+begin_src bash
+export SEAMS_LANG_LIB=/path/to/libseams_lang.so
+export SEAMS_LIB=/path/to/libseams.so
+julia --project=. dev/develop_jll.jl
+julia --project=. -e 'using Pkg; Pkg.test()'
+#+end_src
+
+Tests in =test/readers.jl= for =.con=, PDB, and GRO files are gated solely on
+=has_readcon()= and =has_chemfiles()=.
+When the loaded engine was built without those optional readers, those tests
+verify that =read_frame= raises =SeamsError= and skip the positive read checks.
+They never skip when the loaded engine supports them.
+
+** Running Full Tests Against a =seams-core= Checkout
+
+To run the full checkout data checks, the =examples/core_counts.jl=,
+=examples/minimal_julia.jl=, and =examples/science_tutorials.jl= scripts, and
+the C++ census oracle (=test/cpp_match.jl=), build =seams-core= with both
+=chemfiles= and =readcon-core= enabled:
+
+#+begin_src bash
+export CORE=/path/to/seams-core
+cd "$CORE"
+pixi run meson setup bbdir -Dwith_tests=true -Dwith_cli=true -Dwith_chemfiles=enabled -Dwith_readcon=enabled
+pixi run ninja -C bbdir bindings/libseams_lang.so bindings/binding_oracle src/libseams.so
+
+cd /path/to/Dseams.jl
+export SEAMS_LANG_LIB="$CORE/bbdir/bindings/libseams_lang.so"
+export SEAMS_LIB="$CORE/bbdir/src/libseams.so"
+export SEAMS_CPP_ORACLE="$CORE/bbdir/bindings/binding_oracle"
+export SEAMS_SOURCE_ROOT="$CORE"
+export DSEAMS_ROOT="$CORE"
+
+julia --project=. dev/develop_jll.jl
+julia --project=. -e 'using Dseams; @assert has_chemfiles() && has_readcon()'
+julia --project=. -e 'using Pkg; Pkg.test()'
+julia --project=lib/Seams -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
+#+end_src
+
+** Testing the Manuals and Doctests
+
+Both Documenter manuals run every exported function's =jldoctest= with
+=checkdocs = :exports=:
+
+#+begin_src bash
+julia --project=docs docs/make.jl
+julia --project=lib/Seams/docs lib/Seams/docs/make.jl
+python3 docs/seo.py check docs/build --base-url https://julia.dseams.info/
+#+end_src
+
+** CI Jobs
+
+=.github/workflows/CI.yml= runs:
+
+- =test=: matrix over Julia =lts= and =1= against =seams-core= at
+  =SEAMS_CORE_REF=, running =Dseams= tests, =Seams= tests, both manuals,
+  =docs/seo.py check=, and link checking (=lychee=).
+- =both-libs=: builds =seams-core= =v2.14.1= explicitly with
+  =-Dwith_chemfiles=enabled -Dwith_readcon=enabled=, asserts =has_chemfiles()=,
+  =has_readcon()=, and =features() == (chemfiles = true, readcon = true)= so
+  reader tests cannot silently skip, and runs both =Dseams= and =Seams= suites.
+- =live=: verifies every published page on =julia.dseams.info= after =gh-pages=
+  deploys on =main= or =vX.Y.Z=.

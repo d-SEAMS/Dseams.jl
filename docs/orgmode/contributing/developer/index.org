@@ -1,0 +1,93 @@
+#+TITLE: Developer Guide
+#+OPTIONS: toc:nil todo:nil num:nil author:nil title:nil
+#+STARTUP: content
+
+* Developer Guide
+
+This section covers the day-to-day development workflow for ~Dseams.jl~.
+
+** Environment Setup
+
+~Dseams.jl~ holds only Julia code, fixtures, documentation, and CI workflows.
+The engine (=libseams_lang= and =libseams=) comes from
+[[https://github.com/d-SEAMS/seams-core][d-SEAMS/seams-core]], built locally with
+Meson and [[https://pixi.sh][pixi]] until =libseams_jll= is registered in
+Julia's =General= registry.
+
+#+begin_src bash
+export CORE=/path/to/seams-core
+cd "$CORE"
+pixi run meson setup bbdir -Dwith_tests=true -Dwith_cli=true -Dwith_chemfiles=enabled -Dwith_readcon=enabled
+pixi run ninja -C bbdir bindings/libseams_lang.so bindings/binding_oracle src/libseams.so
+#+end_src
+
+Then point the local Julia checkout at the stand-in JLL and those shared
+libraries:
+
+#+begin_src bash
+cd /path/to/Dseams.jl
+export SEAMS_LANG_LIB="$CORE/bbdir/bindings/libseams_lang.so"
+export SEAMS_LIB="$CORE/bbdir/src/libseams.so"
+export SEAMS_CPP_ORACLE="$CORE/bbdir/bindings/binding_oracle"
+export SEAMS_SOURCE_ROOT="$CORE"
+export DSEAMS_ROOT="$CORE"
+julia --project=. dev/develop_jll.jl
+#+end_src
+
+Alternatively, =Dseams.set_library!("/path/to/libseams_lang.so")= writes
+=LocalPreferences.toml= so the active project remembers the engine path across
+restarts.
+=SEAMS_LANG_LIB= overrides the preference, and either overrides =libseams_jll=.
+
+** Repository Layout
+
+| Path | Contents |
+|------+----------|
+| =Project.toml=, =src/= | =Dseams=, the registered package; =src/capi.jl= wraps =libseams= |
+| =test/= | =runtests.jl=, =readers.jl=, =emptyframes.jl=, =examples.jl=, =cpp_match.jl=, =fixtures/= |
+| =data/= | Small LAMMPS trajectories shipped with the package and =.source.txt= provenance |
+| =examples/= | Scripts executed by =test/examples.jl= and rendered in the manual |
+| =dev/= | =develop_jll.jl= and the binary-free stand-in =libseams_jll= |
+| =docs/= | Documenter reader manual (=docs/src/=) and Org developer guide (=docs/orgmode/=) |
+| =lib/Seams/= | =Seams=, an unregistered example package over =libseams= |
+| =ci/version/= | =files.txt= listing cogapp-managed version copies |
+
+** Common Tasks
+
+| Task | Command | Description |
+|------+---------+-------------|
+| Develop stand-in JLL | =julia --project=. dev/develop_jll.jl= | Wire =dev/libseams_jll= into the project |
+| Run =Dseams= tests | =julia --project=. -e 'using Pkg; Pkg.test()'= | Run unit, reader, empty-frame, example, and oracle suites |
+| Run =Seams= tests | =julia --project=lib/Seams -e 'using Pkg; Pkg.instantiate(); Pkg.test()'= | Run the =libseams= C API wrapper tests |
+| Build =Dseams= manual | =julia --project=docs docs/make.jl= | Run doctests, render HTML, and apply SEO metadata |
+| Build =Seams= manual | =julia --project=lib/Seams/docs lib/Seams/docs/make.jl= | Run =Seams= doctests and render HTML |
+| Check SEO metadata | =python3 docs/seo.py check docs/build --base-url https://julia.dseams.info/= | Verify canonical tags, sitemap, and =llms.txt= |
+| Preview release notes | =towncrier build --draft= | Preview =CHANGELOG.md= entry from =docs/newsfragments/= |
+| Sync version copies | =python3 -m cogapp -I ci/version -r @ci/version/files.txt= | Regenerate every version copy from =Project.toml= |
+| Check version drift | =python3 -m cogapp -I ci/version --check @ci/version/files.txt= | Fail if any cogapp-managed copy differs from =Project.toml= |
+| Check commits | =cog check --ignore-merge-commits <base>..HEAD= | Verify Conventional Commits with cocogitto |
+| Cut release | =cog bump --version X.Y.Z= | Sync versions, build =CHANGELOG.md=, commit, and tag; see [[file:release.org][release.org]] |
+
+** Shared Files Across =Dseams= and =Seams=
+
+=src/capi.jl= and =lib/Seams/src/capi.jl= are identical copies, as are
+=test/cpp_match.jl= and =lib/Seams/test/cpp_match.jl=.
+Edit both copies in the same commit; =test/runtests.jl= fails when either pair
+diverges.
+
+** Building Reader Documentation
+
+The reader manual is built with Documenter.jl and served at
+[[https://julia.dseams.info][julia.dseams.info]].
+Every exported symbol must have a docstring with a =jldoctest=
+(=checkdocs = :exports=), and =docs/make.jl= runs those doctests against the
+loaded engine.
+Keep reader pages (=docs/src/*.md= and =llms.txt=) strictly for package users:
+no release process, package status, CI badges, or maintainer plumbing.
+
+#+begin_src bash
+julia --project=docs docs/make.jl
+python3 docs/seo.py check docs/build --base-url https://julia.dseams.info/
+#+end_src
+
+See [[file:testing.org][testing.org]], [[file:release.org][release.org]], and [[file:faq.org][faq.org]].

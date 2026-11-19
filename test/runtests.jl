@@ -99,6 +99,8 @@ end
 
 include("emptyframes.jl")
 
+include("readers.jl")
+
 include("examples.jl")
 
 # seams.h against the C++ census, when a seams-core build names the oracle

@@ -1,7 +1,14 @@
 name = "Dseams"
 uuid = "9c873972-df43-4516-af5b-6352a89d4bea"
+# [[[cog
+# import tomllib
+# v = globals().get("version") or tomllib.load(open("Project.toml", "rb"))["version"]
+# cog.outl(f'version = "{v}"')
+# ]]]
 version = "2.14.0"
+# [[[end]]]
 authors = ["Rohit Goswami <rgoswami@ieee.org>", "Amrita Goswami"]
+description = "Julia front for the d-SEAMS molecular trajectory analysis engine: CHILL+ and CHILL ice/clathrate classification, Franzblau primitive rings, hexagonal and double-diamond cages, ring-census signature cages, Steinhardt order parameters (ql, qlbar, q4, q6), neighbour graphs, shell symmetry, jump reorientation tau90, partial RDF, coordination numbers, hydrogen bonds, axial density, topological fingerprints, ion contact pairs, polar/apolar domains, prisms, and monolayers. Supports native LAMMPS trajectories and XYZ files, with optional chemfiles (PDB, GRO, DCD, CIF) and readcon-core (.con) readers when built into the engine."
 
 [deps]
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
@@ -13,7 +20,13 @@ Libdl = "1"
 Preferences = "1.4"
 Test = "1"
 julia = "1.10"
+# [[[cog
+# import tomllib
+# v = globals().get("version") or tomllib.load(open("Project.toml", "rb"))["version"]
+# cog.outl(f'libseams_jll = "={v}"')
+# ]]]
 libseams_jll = "=2.14.0"
+# [[[end]]]
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

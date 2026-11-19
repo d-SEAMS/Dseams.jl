@@ -1,0 +1,47 @@
+# Cocogitto 7+ release driver for Dseams.jl (https://docs.cocogitto.io)
+# Prepare: cog bump --version X.Y.Z  (or --auto / --patch / --minor)
+# Hooks sync Project.toml and all ci/version/files.txt copies via cogapp,
+# then towncrier builds CHANGELOG.md from docs/newsfragments/.
+# Publishing uses Actions > Register Dseams and TagBot after libseams_jll
+# of the same version is merged into Julia's General registry.
+
+from_latest_tag = true
+ignore_merge_commits = true
+disable_changelog = true
+disable_bump_commit = false
+tag_prefix = "v"
+skip_ci = "[skip ci]"
+skip_untracked = false
+branch_whitelist = ["main", "master"]
+
+pre_bump_hooks = [
+    "python3 -m cogapp -D version={{version}} -I ci/version -r @ci/version/files.txt",
+    "towncrier build --yes --version {{version}}",
+]
+
+post_bump_hooks = [
+    "git --no-pager show --stat HEAD",
+    "echo \"Prepared v{{version}}. Push main and trigger Register Dseams once libseams_jll {{version}} is in General.\"",
+]
+
+[commit_types]
+feat = { changelog_title = "Features" }
+fix = { changelog_title = "Bug Fixes" }
+perf = { changelog_title = "Performance" }
+refactor = { changelog_title = "Refactoring" }
+docs = { changelog_title = "Documentation" }
+test = { changelog_title = "Tests" }
+build = { changelog_title = "Build System" }
+ci = { changelog_title = "CI" }
+chore = { changelog_title = "Miscellaneous" }
+style = { changelog_title = "Style" }
+revert = { changelog_title = "Reverts" }
+release = { changelog_title = "Releases" }
+
+[changelog]
+path = "CHANGELOG.md"
+authors = [{ username = "HaoZeke", signature = "Rohit Goswami" }]
+
+[git_hooks]
+
+[bump_profiles]

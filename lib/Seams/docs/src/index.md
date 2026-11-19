@@ -8,11 +8,17 @@ re-exports.
 `SEAMS_LIB` names `libseams.so` from a seams-core build (`build/src`)
 when it is not on the loader path.
 
-Quick run:
+Quick run, reading seams-core's own ice Ih trajectory:
 
 ```bash
-export SEAMS_LIB=/path/to/seams-core/bbdir/src/libseams.so
-julia --project=lib/Seams -e 'using Pkg; Pkg.instantiate(); using Seams; println(six_rings())'
+export CORE=/path/to/seams-core
+export SEAMS_LIB="$CORE/bbdir/src/libseams.so"
+julia --project=lib/Seams -e '
+using Pkg; Pkg.instantiate(); using Seams
+sys = System()
+seams_system_read(sys, ARGS[1])
+println(six_rings(sys).count)
+' "$CORE/input/traj/ice1h.lammpstrj"
 ```
 
 Expected output:
