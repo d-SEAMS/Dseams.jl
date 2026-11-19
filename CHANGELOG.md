@@ -33,6 +33,9 @@ and the version follows the d-SEAMS engine release in `libseams_jll`.
   sitemap and `robots.txt` use.
 - The getting-started smoke test no longer escapes `"` inside a
   single-quoted shell string, which Julia read as a `ParseError`.
+- The Seams quick-run example reads a trajectory into a `System` and
+  calls `six_rings(sys).count`, in place of the no-argument
+  `six_rings()` call that `six_rings` does not accept.
 
 ## [2.14.0] - 2026-11-17
 
