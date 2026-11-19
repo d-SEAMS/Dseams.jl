@@ -25,7 +25,7 @@ module Dseams
 using Libdl
 using Preferences: load_preference, set_preferences!, delete_preferences!
 
-export Frame, nop, nframes, read_frame, neighbour_pairs, chill_plus, cages, primitive_rings, steinhardt, signature_cages, symmetry, jump_tau90, q4_q6
+export Frame, nop, nframes, read_frame, has_chemfiles, has_readcon, features, neighbour_pairs, chill_plus, cages, primitive_rings, steinhardt, signature_cages, symmetry, jump_tau90, q4_q6
 
 const DATA = normpath(joinpath(@__DIR__, "..", "data"))
 
@@ -146,6 +146,116 @@ function _check(code::Integer)
     throw(SeamsError(err))
 end
 
+const _CHEMFILES_EXTENSIONS = ("pdb", "gro", "dcd", "xtc", "trr", "cif", "mmcif", "mol2", "nc")
+const _FEATURES_LOCK = ReentrantLock()
+const _FEATURES = Ref{Union{Nothing,NamedTuple{(:chemfiles, :readcon),Tuple{Bool,Bool}}}}(nothing)
+
+function _probe_features()
+    so = _so()
+    sym_chem = dlsym(so, :seams_lang_has_chemfiles; throw_error = false)
+    sym_con = dlsym(so, :seams_lang_has_readcon; throw_error = false)
+    if sym_chem !== nothing && sym_con !== nothing
+        return (
+            chemfiles = ccall(sym_chem, Cint, ()) != 0,
+            readcon = ccall(sym_con, Cint, ()) != 0,
+        )
+    end
+    dir = mktempdir()
+    try
+        chem = if sym_chem !== nothing
+            ccall(sym_chem, Cint, ()) != 0
+        else
+            cif = joinpath(dir, "probe.cif")
+            write(
+                cif,
+                "data_probe\n" *
+                "_cell_length_a 10.0\n_cell_length_b 10.0\n_cell_length_c 10.0\n" *
+                "_cell_angle_alpha 90.0\n_cell_angle_beta 90.0\n_cell_angle_gamma 90.0\n" *
+                "loop_\n_atom_site_label\n_atom_site_type_symbol\n" *
+                "_atom_site_Cartn_x\n_atom_site_Cartn_y\n_atom_site_Cartn_z\n" *
+                "O1 O 1.0 1.0 1.0\n",
+            )
+            ccall(dlsym(so, :seams_path_nframes), Cint, (Cstring,), cif) > 0
+        end
+        con = if sym_con !== nothing
+            ccall(sym_con, Cint, ()) != 0
+        else
+            con_path = joinpath(dir, "probe.con")
+            write(
+                con_path,
+                "Random Number Seed\n{\"con_spec_version\":2}\n" *
+                "10.0 10.0 10.0\n90.0 90.0 90.0\n0 0\n1 0 1\n1\n1\n16.0\nO\n" *
+                "Coordinates of Component 1\n 1.0 1.0 1.0 0 0\n",
+            )
+            ptr = ccall(dlsym(so, :seams_frame_read), Ptr{Cvoid}, (Cstring, Cint, Cint), con_path, 1, -1)
+            if ptr != C_NULL
+                ccall(dlsym(so, :seams_frame_free), Cvoid, (Ptr{Cvoid},), ptr)
+                true
+            else
+                false
+            end
+        end
+        return (chemfiles = chem, readcon = con)
+    finally
+        rm(dir; recursive = true, force = true)
+    end
+end
+
+"""
+    features()
+
+Optional reader backends supported by the loaded `libseams_lang`, returned as
+`(chemfiles = Bool, readcon = Bool)`.
+
+```jldoctest
+julia> using Dseams
+
+julia> keys(features()) == (:chemfiles, :readcon)
+true
+```
+"""
+function features()
+    lock(_FEATURES_LOCK) do
+        cached = _FEATURES[]
+        if cached === nothing
+            cached = _probe_features()
+            _FEATURES[] = cached
+        end
+        cached
+    end
+end
+
+"""
+    has_chemfiles()
+
+`true` when the loaded engine was built with chemfiles support (PDB, GRO, DCD,
+CIF, and related trajectory formats), `false` when only the native LAMMPS and
+XYZ readers are built in.
+
+```jldoctest
+julia> using Dseams
+
+julia> has_chemfiles() isa Bool
+true
+```
+"""
+has_chemfiles() = features().chemfiles
+
+"""
+    has_readcon()
+
+`true` when the loaded engine was built with `readcon-core` support for `.con`
+trajectories, `false` otherwise.
+
+```jldoctest
+julia> using Dseams
+
+julia> has_readcon() isa Bool
+true
+```
+"""
+has_readcon() = features().readcon
+
 """
     Frame
 
@@ -249,7 +359,9 @@ end
 """
     nframes(path)
 
-Number of frames in a trajectory. An XYZ file counts as one.
+Number of frames in a trajectory. Native LAMMPS dumps and XYZ files are always
+supported; PDB, GRO, and other chemfiles formats are counted when
+[`has_chemfiles`](@ref) is `true`.
 """
 function nframes(path::AbstractString)
     _need_file(path)
@@ -261,8 +373,10 @@ end
 """
     read_frame(path; frame=1, type=0)
 
-Read one frame. `frame` is 1-based. `type = 0` guesses oxygen. A positive
-type keeps that species. A negative type keeps every atom.
+Read one frame. Native LAMMPS trajectory dumps and XYZ files are always
+supported; PDB, GRO, DCD, and CIF require [`has_chemfiles`](@ref), and `.con`
+files require [`has_readcon`](@ref). `frame` is 1-based. `type = 0` guesses
+oxygen. A positive type keeps that species. A negative type keeps every atom.
 
 A frame that holds no atoms, or none of the kept `type`, is a valid frame
 with `nop(frame) == 0`, and every analysis accepts it. A `frame` below 1,
@@ -272,6 +386,10 @@ gives an empty frame.
 function read_frame(path::AbstractString; frame::Integer = 1, type::Integer = 0)
     _need_file(path)
     frame >= 1 || throw(SeamsError("frame index starts at 1, got $(frame)"))
+    ext = lowercase(lstrip(splitext(path)[2], '.'))
+    if ext in _CHEMFILES_EXTENSIONS && !has_chemfiles()
+        throw(SeamsError("chemfiles is not in this build; $(uppercase(ext)) input needs it"))
+    end
     # The engine answers a frame past the end of a LAMMPS dump with an empty
     # frame, which a zero-atom frame in the file also is, and a later
     # nframes of that file then counts the frame that was asked for. A count
