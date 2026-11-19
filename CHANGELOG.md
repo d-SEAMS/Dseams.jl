@@ -40,6 +40,7 @@ and the version follows the d-SEAMS engine release in `libseams_jll`.
   `Dseams.set_library!`, `LocalPreferences.toml`, `SEAMS_LANG_LIB` and
   `Overrides.toml`, is restored after being dropped from the reader
   rewrite.
+- `llms.txt` lists the getting-started page.
 
 ## [2.14.0] - 2026-11-17
 

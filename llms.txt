@@ -7,6 +7,7 @@ The package is `Dseams`. It calls `libseams_lang`, the C ABI of the d-SEAMS engi
 ## Manual
 
 - [Dseams](https://julia.dseams.info/): What Dseams computes, how it relates to Seams, how the engine library is found, and the example data.
+- [Getting started](https://julia.dseams.info/getting-started/): Build the engine, configure Dseams, and run a smoke test.
 - [Examples](https://julia.dseams.info/examples/): The scripts in `examples/`, which the tests run, with the census line each prints.
 - [API](https://julia.dseams.info/api/): Docstrings of every exported function, each with a doctest.
 - [Julia chapter of the book](https://docs.dseams.info/stable/julia.html): The Julia front in the d-SEAMS documentation.
