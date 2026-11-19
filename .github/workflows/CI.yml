@@ -27,6 +27,7 @@ env:
   # acc8bbc803f55bac39493c85300f87a8ce302829. Checkout the tag, not a branch.
   SEAMS_CORE_REPO: d-SEAMS/seams-core
   SEAMS_CORE_REF: v2.14.0
+  SEAMS_CORE_READERS_REF: v2.14.1
 
 jobs:
   test:
@@ -152,6 +153,50 @@ jobs:
         with:
           name: site-pages
           path: site-pages.txt
+
+  # Build seams-core explicitly with both chemfiles and readcon-core enabled,
+  # assert that the feature queries report both as true, and run the suites so
+  # the .con, PDB, and GRO tests cannot silently skip.
+  both-libs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ env.SEAMS_CORE_REPO }}
+          ref: ${{ env.SEAMS_CORE_READERS_REF }}
+          path: seams-core
+      - uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347 # v0.10.1
+        with:
+          manifest-path: seams-core/pixi.toml
+          environments: default
+          cache-key: pixi-seams-core-
+      - name: Build seams-core with chemfiles and readcon-core
+        working-directory: seams-core
+        run: |
+          pixi run meson setup bbdir -Dwith_tests=true -Dwith_cli=true -Dwith_chemfiles=enabled -Dwith_readcon=enabled
+          pixi run ninja -C bbdir bindings/libseams_lang.so bindings/binding_oracle src/libseams.so
+      - uses: julia-actions/setup-julia@da908477b5db94c10ffce8cfea9f2b3b9d5db687 # v3.0.3
+        with:
+          version: "1"
+      - name: Engine settings
+        run: |
+          core="$GITHUB_WORKSPACE/seams-core"
+          {
+            echo "SEAMS_LANG_LIB=$core/bbdir/bindings/libseams_lang.so"
+            echo "SEAMS_LIB=$core/bbdir/src/libseams.so"
+            echo "SEAMS_CPP_ORACLE=$core/bbdir/bindings/binding_oracle"
+            echo "SEAMS_SOURCE_ROOT=$core"
+            echo "DSEAMS_ROOT=$core"
+          } >> "$GITHUB_ENV"
+      - name: Verify reader feature queries
+        run: |
+          julia --project=. dev/develop_jll.jl
+          julia --project=. -e 'using Dseams; @assert has_chemfiles(); @assert has_readcon(); @assert features() == (chemfiles = true, readcon = true)'
+      - name: Test Dseams
+        run: julia --project=. -e 'using Pkg; Pkg.test()'
+      - name: Test Seams
+        run: julia --project=lib/Seams -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
 
   # The published manual, page by page, once GitHub Pages has built the
   # gh-pages commit that the current Julia job pushed. Each page is fetched from
