@@ -36,6 +36,10 @@ and the version follows the d-SEAMS engine release in `libseams_jll`.
 - The Seams quick-run example reads a trajectory into a `System` and
   calls `six_rings(sys).count`, in place of the no-argument
   `six_rings()` call that `six_rings` does not accept.
+- The Dseams manual's "The engine library" section, on `libseams_jll`,
+  `Dseams.set_library!`, `LocalPreferences.toml`, `SEAMS_LANG_LIB` and
+  `Overrides.toml`, is restored after being dropped from the reader
+  rewrite.
 
 ## [2.14.0] - 2026-11-17
 
