@@ -54,3 +54,14 @@ Expected output:
 julia --project=. -e 'using Pkg; Pkg.test()'
 julia --project=docs docs/make.jl
 ```
+
+## 6. Check optional readers
+
+Native LAMMPS dumps and XYZ files are always supported. Check whether the loaded engine also includes chemfiles (PDB, GRO, DCD, CIF) and `readcon-core` (`.con`):
+
+```julia
+using Dseams
+features()       # (chemfiles = ..., readcon = ...)
+has_chemfiles()  # true when chemfiles readers are available
+has_readcon()    # true when readcon-core (.con) is available
+```

@@ -1,9 +1,10 @@
 # Dseams
 
 `Dseams.jl` is a Julia front for the [d-SEAMS](https://docs.dseams.info)
-engine. It reads LAMMPS trajectories and exposes the same core analyses:
-CHILL+, primitive rings, cage census, Steinhardt order, shell symmetry,
-and jump reorientation times.
+engine. It reads LAMMPS trajectories and XYZ files (plus PDB, GRO, and
+`.con` when the engine includes chemfiles and `readcon-core`) and exposes
+the same core analyses: CHILL+, primitive rings, cage census, Steinhardt
+order, shell symmetry, and jump reorientation times.
 
 ```julia
 using Dseams
