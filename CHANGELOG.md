@@ -31,6 +31,8 @@ and the version follows the d-SEAMS engine release in `libseams_jll`.
   that size gives a count.
 - `llms.txt` links to the manual at the site root, the same base the
   sitemap and `robots.txt` use.
+- The getting-started smoke test no longer escapes `"` inside a
+  single-quoted shell string, which Julia read as a `ParseError`.
 
 ## [2.14.0] - 2026-11-17
 

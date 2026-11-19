@@ -39,7 +39,7 @@ export DSEAMS_ROOT="$CORE"
 ## 4. Run a smoke test
 
 ```bash
-julia --project=. -e 'using Dseams; f=read_frame(Dseams.ice_ih_path(); type=-1); println(chill_plus(f; graph=\"cutoff\").counts[\"hexagonal\"])'
+julia --project=. -e 'using Dseams; f=read_frame(Dseams.ice_ih_path(); type=-1); println(chill_plus(f; graph="cutoff").counts["hexagonal"])'
 ```
 
 Expected output:
