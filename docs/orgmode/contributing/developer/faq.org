@@ -1,0 +1,58 @@
+#+TITLE: Developer FAQ
+#+OPTIONS: toc:nil todo:nil num:nil author:nil title:nil
+#+STARTUP: content
+
+* Developer FAQ
+
+** Why does =dev/libseams_jll= exist?
+
+Until =libseams_jll= is merged into Julia's =General= registry, =Pkg= cannot
+resolve =libseams_jll= from a registry.
+=dev/libseams_jll= is a binary-free stand-in whose =is_available()= returns
+=false=.
+Running =julia --project=. dev/develop_jll.jl= points the local environment at
+that stand-in so =Dseams= loads =SEAMS_LANG_LIB= (or the =libseams_lang=
+preference) instead.
+
+** How does =Dseams= locate =libseams_lang= and =libseams=?
+
+=Dseams.library_path()= checks in order:
+1. =ENV["SEAMS_LANG_LIB"]=
+2. The =libseams_lang= preference written by =Dseams.set_library!(path)=
+3. =libseams_jll.libseams_lang_path= when =libseams_jll.is_available()= is
+   =true=, else ="libseams_lang"= on the dynamic loader path.
+
+The lower-level C API wrappers in =src/capi.jl= (and =lib/Seams=) open
+=ENV["SEAMS_LIB"]= or ="libseams"= on the loader path.
+
+** How do =has_chemfiles()=, =has_readcon()=, and =features()= work?
+
+=Dseams= does not compile C++ sources directly; optional readers live in the
+loaded =libseams_lang= / =libyodaLib= shared library.
+When first queried, =Dseams= inspects the loaded =libseams_lang= once (checking
+for exported capability symbols if present, and otherwise probing
+=seams_path_nframes= on a minimal CIF snippet for =chemfiles= and
+=seams_frame_read= on a minimal =.con= snippet for =readcon-core=) and caches
+the resulting =(chemfiles = Bool, readcon = Bool)= tuple for the process.
+
+** Why are =src/capi.jl= and =test/cpp_match.jl= duplicated in =lib/Seams=?
+
+=lib/Seams= is a standalone unregistered example package showing direct use of
+the stable =libseams= C API (=include/seams.h=).
+Keeping its own copy lets =lib/Seams= instantiate and pass tests on its own.
+=test/runtests.jl= verifies that both copies stay byte-identical.
+
+** Why are reader fixtures in =test/fixtures/= instead of =data/=?
+
+=test/runtests.jl= asserts that every file in =data/= matches
+=$DSEAMS_ROOT/input/traj/<name>= byte for byte.
+Keeping PDB, GRO, and =.con= fixtures in =test/fixtures/= avoids breaking
+that check and lets the reader tests gate solely on =has_chemfiles()= and
+=has_readcon()=, even when =DSEAMS_ROOT= is unset.
+
+** Why are developer and release docs in Org mode outside =docs/src/=?
+
+=docs/src/= builds the user-facing Documenter site at =julia.dseams.info=.
+Keeping developer workflow, testing internals, and release instructions in
+=docs/orgmode/contributing/developer/= follows the =OmniPotentRPC/rgpot= layout
+and keeps maintainer plumbing out of reader documentation.

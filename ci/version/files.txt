@@ -1,0 +1,11 @@
+# Copies of the release version, kept in lockstep with `version` in the
+# root Project.toml via cogapp markers in each file.
+# Regenerate: python3 -m cogapp -I ci/version -r @ci/version/files.txt
+# Check:      python3 -m cogapp -I ci/version --check @ci/version/files.txt
+Project.toml
+lib/Seams/Project.toml
+dev/libseams_jll/Project.toml
+docs/Project.toml
+CITATION.cff
+towncrier.toml
+.github/workflows/CI.yml

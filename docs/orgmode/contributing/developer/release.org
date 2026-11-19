@@ -1,0 +1,162 @@
+#+TITLE: Release Process
+#+OPTIONS: toc:nil todo:nil num:nil author:nil title:nil
+#+STARTUP: content
+
+* Release Process
+
+~Dseams.jl~ has one release version, written in one place: the =version= key
+of the root =Project.toml=.
+Every copy sits between cogapp markers in a file listed in
+=ci/version/files.txt=:
+
+- =Project.toml= (=version = "X.Y.Z"= and =libseams_jll = "=X.Y.Z"= compat pin)
+- =lib/Seams/Project.toml= (=version = "X.Y.Z"=)
+- =dev/libseams_jll/Project.toml= (=version = "X.Y.Z+0"=)
+- =docs/Project.toml= (=libseams_jll = "=X.Y.Z"=)
+- =CITATION.cff= (=version: "X.Y.Z"=)
+- =towncrier.toml= (=version = "X.Y.Z"=)
+- =.github/workflows/CI.yml= (=SEAMS_CORE_REF: vX.Y.Z= and
+  =SEAMS_CORE_READERS_REF: vX.Y.Z=)
+
+Each marker block reads =globals().get("version")= when =cogapp= is invoked
+with =-D version=X.Y.Z= during =cog bump=, and otherwise reads =version= from
+the root =Project.toml= via standard library =tomllib=.
+Regenerate the copies or verify lockstep with cogapp:
+
+#+begin_src bash
+python3 -m cogapp -I ci/version -r @ci/version/files.txt
+python3 -m cogapp -I ci/version --check @ci/version/files.txt
+#+end_src
+
+Git tags use the =vX.Y.Z= prefix configured in =cog.toml= (=tag_prefix = "v"=).
+Requires [[https://docs.cocogitto.io][cocogitto]] 7+,
+[[https://towncrier.readthedocs.io][towncrier]], and =cogapp=.
+Do *not* hand-edit a =## [X.Y.Z]= section above the towncrier marker in
+=CHANGELOG.md=; add fragments under =docs/newsfragments/= instead.
+
+Tooling and workflows:
+
+| Tool / Workflow | Role |
+|-----------------+------|
+| [[https://docs.cocogitto.io][cocogitto]] (=cog=) 7+ | Conventional-commit check and =cog bump= driver (=cog.toml=) |
+| [[https://towncrier.readthedocs.io][towncrier]] | Curated =CHANGELOG.md= assembly from =docs/newsfragments/= (=towncrier.toml=) |
+| =cogapp= | Lockstep version generation across =ci/version/files.txt= |
+| =.github/workflows/CI.yml= | Runs =test= (Julia LTS and 1) and =both-libs= (chemfiles + readcon-core) and deploys docs |
+| =.github/workflows/julia-register.yml= | Dispatched manually (=Actions > Register Dseams=) to post =@JuliaRegistrator register= |
+| =.github/workflows/julia-tagbot.yml= | Creates the =vX.Y.Z= release tag once General merges and dispatches =CI.yml= on it |
+
+** Changelog Fragments
+
+Add a fragment under =docs/newsfragments/= for each user-visible change:
+
+#+begin_src bash
+towncrier create --content "Short user-facing note." +slug.added.md
+#+end_src
+
+Allowed types in =towncrier.toml=: =breaking=, =security=, =removed=,
+=deprecated=, =added=, =dev=, =changed=, =fixed=, =misc=.
+Preview the unreleased section without modifying =CHANGELOG.md=:
+
+#+begin_src bash
+towncrier build --draft
+#+end_src
+
+** Commit Check
+
+Verify Conventional Commits against the base revision before preparing a
+release:
+
+#+begin_src bash
+cog check --ignore-merge-commits <base>..HEAD
+# Once a v* tag exists:
+cog check --ignore-merge-commits --from-latest-tag
+#+end_src
+
+** Upstream Prerequisite
+
+=Dseams.jl= tracks the =d-SEAMS/seams-core= release in =libseams_jll=.
+Before releasing =X.Y.Z= here:
+
+1. Tag =vX.Y.Z= on =d-SEAMS/seams-core=.
+2. Merge the matching =libseams_jll= =X.Y.Z= build (recipe in
+   =seams-core/packaging/yggdrasil=) into Julia's =General= registry.
+   =General= rejects registration of =Dseams= while =[compat] libseams_jll=
+   names an unregistered version.
+
+** Step-by-Step Release Path (Clean Clone to General)
+
+1. Start from a clean clone on =main= with a local =seams-core= build at =vX.Y.Z=
+   (with both =chemfiles= and =readcon-core= enabled):
+
+   #+begin_src bash
+   git clone https://github.com/d-SEAMS/Dseams.jl.git
+   cd Dseams.jl
+   export CORE=/path/to/seams-core
+   export SEAMS_LANG_LIB="$CORE/bbdir/bindings/libseams_lang.so"
+   export SEAMS_LIB="$CORE/bbdir/src/libseams.so"
+   export SEAMS_CPP_ORACLE="$CORE/bbdir/bindings/binding_oracle"
+   export SEAMS_SOURCE_ROOT="$CORE"
+   export DSEAMS_ROOT="$CORE"
+   julia --project=. dev/develop_jll.jl
+   #+end_src
+
+2. Run the full test suites and documentation builds:
+
+   #+begin_src bash
+   julia --project=. -e 'using Dseams; @assert has_chemfiles() && has_readcon()'
+   julia --project=. -e 'using Pkg; Pkg.test()'
+   julia --project=lib/Seams -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
+   julia --project=docs docs/make.jl
+   julia --project=lib/Seams/docs lib/Seams/docs/make.jl
+   python3 docs/seo.py check docs/build --base-url https://julia.dseams.info/
+   #+end_src
+
+3. Check commits, version copies, and draft changelog:
+
+   #+begin_src bash
+   cog check --ignore-merge-commits <base>..HEAD
+   python3 -m cogapp -I ci/version --check @ci/version/files.txt
+   towncrier build --draft
+   #+end_src
+
+4. Dry-run the bump for target version =X.Y.Z=:
+
+   #+begin_src bash
+   cog bump --version X.Y.Z --dry-run
+   # Or, once a prior v* tag exists:
+   # cog bump --auto --dry-run
+   #+end_src
+
+5. Execute the bump locally on =main=:
+
+   =cog bump --version X.Y.Z= runs =pre_bump_hooks= in =cog.toml=:
+   - runs =python3 -m cogapp -D version=X.Y.Z -I ci/version -r @ci/version/files.txt=
+     to update =Project.toml= and every copy in =ci/version/files.txt=
+   - runs =towncrier build --yes --version X.Y.Z= (consumes =docs/newsfragments/=
+     and updates =CHANGELOG.md=)
+   - commits the release and creates the local annotated tag =vX.Y.Z=
+
+   #+begin_src bash
+   cog bump --version X.Y.Z
+   #+end_src
+
+6. Push the release commit on =main= (hold back the =vX.Y.Z= tag so =TagBot=
+   creates it after =General= merges, or delete the local tag with
+   =git tag -d vX.Y.Z= before pushing):
+
+   #+begin_src bash
+   git push origin HEAD:main
+   #+end_src
+
+7. Wait for =CI.yml= (=test= on Julia LTS and 1, plus =both-libs=) to turn
+   green on =main=.
+
+8. Trigger =Actions > Register Dseams= (=.github/workflows/julia-register.yml=)
+   with =ref: main=.
+   The workflow comments =@JuliaRegistrator register= on the release commit.
+
+9. After =General= merges the registration pull request:
+   - =TagBot= (=.github/workflows/julia-tagbot.yml=) tags =vX.Y.Z= on GitHub.
+   - =TagBot= dispatches =CI.yml= on =vX.Y.Z=, which publishes the tagged
+     manual under =https://julia.dseams.info/vX.Y.Z/= on =gh-pages=.
+   - Verify the live pages check passes.

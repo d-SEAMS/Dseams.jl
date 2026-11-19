@@ -26,8 +26,24 @@ env:
   # a54eee70f37da364f7abcbb49842b90b41d6ed07), which points at
   # acc8bbc803f55bac39493c85300f87a8ce302829. Checkout the tag, not a branch.
   SEAMS_CORE_REPO: d-SEAMS/seams-core
+  # [[[cog
+  # import tomllib
+  # v = globals().get("version") or tomllib.load(open("Project.toml", "rb"))["version"]
+  # cog.outl(f'SEAMS_CORE_REF: v{v}')
+  # ]]]
   SEAMS_CORE_REF: v2.14.0
+  # [[[end]]]
+  # both-libs tests at least v2.14.1 (current seams-core release with
+  # chemfiles and readcon-core) and follows Project.toml at bumps >= 2.14.1.
+  # [[[cog
+  # import tomllib
+  # v = globals().get("version") or tomllib.load(open("Project.toml", "rb"))["version"]
+  # t = tuple(int(x) for x in v.split("-")[0].split("."))
+  # ref = v if t >= (2, 14, 1) else "2.14.1"
+  # cog.outl(f'SEAMS_CORE_READERS_REF: v{ref}')
+  # ]]]
   SEAMS_CORE_READERS_REF: v2.14.1
+  # [[[end]]]
 
 jobs:
   test:
