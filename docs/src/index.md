@@ -1,8 +1,9 @@
 # Dseams
 
-Julia front for the [d-SEAMS](https://docs.dseams.info) engine: CHILL+,
-primitive rings, ice cages, Steinhardt parameters and shell symmetry on
-LAMMPS trajectories.
+`Dseams.jl` is a Julia front for the [d-SEAMS](https://docs.dseams.info)
+engine. It reads LAMMPS trajectories and exposes the same core analyses:
+CHILL+, primitive rings, cage census, Steinhardt order, shell symmetry,
+and jump reorientation times.
 
 ```julia
 using Dseams
@@ -11,50 +12,29 @@ chill_plus(f; graph = "cutoff").counts["hexagonal"]       # 128
 primitive_rings(f; graph = "cutoff", max_depth = 6)[6]    # 256
 ```
 
-The [Julia chapter](https://docs.dseams.info/stable/julia.html) of the d-SEAMS book covers the same front, and
-a [video walk-through](https://odysee.com/dseams-julia:ec237bd28c57b7bdfa2996ccc420c16d9799176f) shows the package in use.
+The [Julia chapter](https://docs.dseams.info/stable/julia.html) of the
+d-SEAMS book covers the same interface, and a
+[video walk-through](https://odysee.com/dseams-julia:ec237bd28c57b7bdfa2996ccc420c16d9799176f)
+shows a full session.
 
 ```@raw html
 <iframe id="odysee-iframe" title="Dseams.jl walk-through" width="560" height="315" src="https://odysee.com/$/embed/dseams-julia:ec237bd28c57b7bdfa2996ccc420c16d9799176f" allowfullscreen></iframe>
 ```
 
-## Dseams and Seams
+## What to read next
 
-This repository has two Julia packages. **Dseams** (the repository root)
-is the one to install. It reads trajectories and has the same frame
-analyses as the R package. It calls `libseams_lang`, the C ABI shared by
-the R and Julia fronts.
+- [Getting started](getting-started.md): build the engine, configure
+  `Dseams`, and run a smoke test.
+- [Examples](examples.md): runnable scripts and expected outputs.
+- [API](api.md): function reference for frame analysis and lower-level
+  wrappers.
 
-`lib/Seams` is a short example of the stable C API in seams-core's
-`include/seams.h` (`libseams`). It works on coordinates the caller passes
-in and reads no files. It is kept as an example of that API and is not
-registered.
+This repository also includes `lib/Seams`, a compact example package
+around the lower-level `libseams` C API.
 
-## The engine library
+## Data used in examples
 
-`libseams_jll` provides the engine for Linux (glibc and musl; x86_64,
-aarch64, powerpc64le, riscv64) and macOS once the recipe pinned to
-seams-core tag `v2.14.0` is merged into Yggdrasil. Neither it nor
-Dseams is in the General registry yet. Until then `dev/develop_jll.jl`
-develops a stand-in `libseams_jll` with no binaries, and the engine is a
-local build of [seams-core](https://github.com/d-SEAMS/seams-core). To use
-one, name its `libseams_lang`:
-
-```julia
-Dseams.set_library!("/path/to/seams-core/build/bindings/libseams_lang.so")
-# restart Julia; Dseams.set_library!(nothing) goes back to the JLL
-```
-
-This writes the `libseams_lang` preference to `LocalPreferences.toml`.
-The `SEAMS_LANG_LIB` environment variable takes precedence over the
-preference. With either one set, `libseams_jll` is not loaded.
-
-To replace the whole JLL artifact with an install prefix instead, use
-an `Overrides.toml` in `~/.julia/artifacts`, as for any JLL.
-
-## Example data
-
-`Dseams.example_path(name)` returns one of the trajectories in `data/`:
+`Dseams.example_path(name)` resolves the trajectories bundled in `data/`:
 `ice1h.lammpstrj` (ice Ih, 128 oxygens), `exampleTraj.lammpstrj` (a
 TIP4P/ice frame) and `nucleation_f1.lammpstrj` (one frame of an mW
 nucleation run). The `.source.txt` files there record where they came
