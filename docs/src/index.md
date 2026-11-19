@@ -36,12 +36,12 @@ around the lower-level `libseams` C API.
 ## The engine library
 
 `libseams_jll` provides the engine for Linux (glibc and musl; x86_64,
-aarch64, powerpc64le, riscv64) and macOS once the recipe pinned to
-seams-core tag `v2.14.0` is merged into Yggdrasil. Neither it nor
-Dseams is in the General registry yet. Until then `dev/develop_jll.jl`
-develops a stand-in `libseams_jll` with no binaries, and the engine is a
-local build of [seams-core](https://github.com/d-SEAMS/seams-core). To use
-one, name its `libseams_lang`:
+aarch64, powerpc64le, riscv64) and macOS once the recipe, pinned to
+seams-core commit `c1efa8c`, is merged into Yggdrasil.
+`dev/develop_jll.jl` develops a stand-in `libseams_jll` with no binaries,
+and the engine is a local build of
+[seams-core](https://github.com/d-SEAMS/seams-core). To use one, name its
+`libseams_lang`:
 
 ```julia
 Dseams.set_library!("/path/to/seams-core/bbdir/bindings/libseams_lang.so")
