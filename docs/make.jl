@@ -63,7 +63,12 @@ makedocs(;
         ],
     ),
     repo = PublishedRemote(),
-    pages = ["Home" => "index.md", "Examples" => "examples.md", "API" => "api.md"],
+    pages = [
+        "Home" => "index.md",
+        "Getting started" => "getting-started.md",
+        "Examples" => "examples.md",
+        "API" => "api.md",
+    ],
 )
 
 # The d-SEAMS family strip, vendored scripts and fonts: no page asks a CDN for anything.

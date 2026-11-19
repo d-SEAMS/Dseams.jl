@@ -1,10 +1,24 @@
 # Examples
 
-The scripts in `examples/` run in the test suite: `test/examples.jl`
-starts each one in its own process and checks its exit status and the
-line it prints. `lang_tasks.jl` and `julia_api.jl` read the frames in
-`data/`. The others read seams-core's `input/traj` and run when
-`DSEAMS_ROOT` names a seams-core checkout.
+All scripts in `examples/` are exercised by `test/examples.jl`. Each
+script runs in its own process and the test checks both exit status and
+printed output.
+
+Run the scripts that only use bundled data:
+
+```bash
+julia --project=. examples/lang_tasks.jl
+julia --project=. examples/julia_api.jl
+```
+
+Run the scripts that use trajectories from a `seams-core` checkout:
+
+```bash
+export DSEAMS_ROOT=/path/to/seams-core
+julia --project=. examples/core_counts.jl
+julia --project=. examples/minimal_julia.jl "$DSEAMS_ROOT/input/traj/genice_sI.lammpstrj"
+julia --project=. examples/science_tutorials.jl "$DSEAMS_ROOT"
+```
 
 ## Neighbours, rings and CHILL+
 
@@ -20,6 +34,8 @@ Markdown.parse("```julia\n" * read(joinpath(pkgdir(Dseams), "examples", "lang_ta
 
 ## CHILL+ and q4/q6 on the TIP4P/ice frame
 
+Expected output: `julia api ok`.
+
 ```@eval
 import Markdown, Dseams
 Markdown.parse("```julia\n" * read(joinpath(pkgdir(Dseams), "examples", "julia_api.jl"), String) * "```")
@@ -27,12 +43,17 @@ Markdown.parse("```julia\n" * read(joinpath(pkgdir(Dseams), "examples", "julia_a
 
 ## Ice Ih and sII census
 
+Expected output:
+`julia hexagonal 128 rings6 256 clathrate 136 rings5 144`.
+
 ```@eval
 import Markdown, Dseams
 Markdown.parse("```julia\n" * read(joinpath(pkgdir(Dseams), "examples", "core_counts.jl"), String) * "```")
 ```
 
 ## The GenIce sI cell
+
+Expected output: `julia example ok`.
 
 ```@eval
 import Markdown, Dseams
@@ -43,6 +64,13 @@ Markdown.parse("```julia\n" * read(joinpath(pkgdir(Dseams), "examples", "minimal
 
 The interface and nucleus layer stacks and the clathrate cage counts,
 called through `libseams` with `ccall` and no package beyond `Libdl`.
+
+Expected output includes:
+
+- `interface hexagonal 352 water 434 interfacial 49 cubic 1`
+- `nucleus cubic 47 hexagonal 62 water 3589 interfacial 240`
+- `cages sII 512 16`
+- `cages sH 51268 4`
 
 ```@eval
 import Markdown, Dseams
