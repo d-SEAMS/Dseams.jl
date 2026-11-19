@@ -41,6 +41,9 @@ and the version follows the d-SEAMS engine release in `libseams_jll`.
   `Overrides.toml`, is restored after being dropped from the reader
   rewrite.
 - `llms.txt` lists the getting-started page.
+- The Dseams manual now states that the Yggdrasil recipe is pinned to the
+  seams-core commit `c1efa8c`, and no longer describes package release
+  status.
 
 ## [2.14.0] - 2026-11-17
 
