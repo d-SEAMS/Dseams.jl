@@ -1,1 +1,0 @@
-The Dseams manual's "The engine library" section, on `libseams_jll`, `Dseams.set_library!`, `LocalPreferences.toml`, `SEAMS_LANG_LIB`, and `Overrides.toml`, is restored after being dropped from the reader rewrite.

@@ -32,14 +32,14 @@ Dseams calls two libraries from seams-core:
   Seams. Found through `SEAMS_LIB`, then the loader path.
 
 `Project.toml` holds `libseams_jll` at the exact engine version
-(`=2.14.0`), and the Dseams version matches it. The Yggdrasil recipe for
+(`=2.14.2`), and the Dseams version matches it. The Yggdrasil recipe for
 `libseams_jll` is in seams-core `packaging/yggdrasil`. Until the JLL is in
 General, `julia --project=. dev/develop_jll.jl` develops the stand-in and
 the engine is a local seams-core build.
 
 CI builds seams-core at the tag pinned as `SEAMS_CORE_REF` in
 `.github/workflows/CI.yml`. That pin is the seams-core release tag
-`v2.14.0`, which matches `[compat] libseams_jll`.
+`v2.14.2`, which matches `[compat] libseams_jll`.
 
 A change to analysis results, the C API or the C ABI goes to seams-core,
 with its tests there. This repository then follows the released engine:

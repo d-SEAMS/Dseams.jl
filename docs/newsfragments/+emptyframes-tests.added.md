@@ -1,1 +1,0 @@
-Tests for empty frames across the public API: a frame with no atoms, a frame of atoms of no kept species, and a frame with atoms and no neighbour inside the cutoff, for Dseams and for the `seams_*` calls.

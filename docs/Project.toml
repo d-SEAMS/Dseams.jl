@@ -11,5 +11,5 @@ julia = "1.10"
 # v = globals().get("version") or tomllib.load(open("Project.toml", "rb"))["version"]
 # cog.outl(f'libseams_jll = "={v}"')
 # ]]]
-libseams_jll = "=2.14.0"
+libseams_jll = "=2.14.2"
 # [[[end]]]

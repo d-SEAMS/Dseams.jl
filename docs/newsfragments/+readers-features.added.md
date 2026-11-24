@@ -1,1 +1,0 @@
-Public feature-query functions (`features()`, `has_chemfiles()`, and `has_readcon()`) reporting whether the loaded `libseams_lang` engine supports chemfiles (PDB, GRO, DCD, CIF) and `readcon-core` (`.con`), plus feature-gated `.con`, PDB, and GRO reader tests.

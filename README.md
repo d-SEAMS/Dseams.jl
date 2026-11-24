@@ -88,16 +88,16 @@ julia --project=. -e 'using Pkg; Pkg.test()'
 julia --project=docs docs/make.jl
 ```
 
-CI does the same against seams-core tag `v2.14.0`, pinned as
+CI does the same against seams-core tag `v2.14.2`, pinned as
 `SEAMS_CORE_REF` in `.github/workflows/CI.yml`.
 
 ## Release order
 
-1. seams-core tags the engine release (`v2.14.0`).
+1. seams-core tags the engine release (`v2.14.2`).
 2. `libseams_jll` of that version is registered in General from the
    Yggdrasil recipe.
 3. `SEAMS_CORE_REF` moves to that tag, `Project.toml` carries the same
-   version with `libseams_jll = "=2.14.0"`, and CI is green on `main`.
+   version with `libseams_jll = "=2.14.2"`, and CI is green on `main`.
 4. The `Register Dseams` workflow asks JuliaRegistrator to register that
    commit. TagBot tags `vX.Y.Z` once General merges it, and the tag
    publishes that version of the manual.

@@ -22,19 +22,16 @@ permissions:
   contents: write
 
 env:
-  # Annotated tag v2.14.0 on d-SEAMS/seams-core (tag object
-  # a54eee70f37da364f7abcbb49842b90b41d6ed07), which points at
-  # acc8bbc803f55bac39493c85300f87a8ce302829. Checkout the tag, not a branch.
+  # Use the annotated seams-core tag matching Project.toml.
   SEAMS_CORE_REPO: d-SEAMS/seams-core
   # [[[cog
   # import tomllib
   # v = globals().get("version") or tomllib.load(open("Project.toml", "rb"))["version"]
   # cog.outl(f'SEAMS_CORE_REF: v{v}')
   # ]]]
-  SEAMS_CORE_REF: v2.14.0
+  SEAMS_CORE_REF: v2.14.2
   # [[[end]]]
-  # both-libs tests at least v2.14.1 (current seams-core release with
-  # chemfiles and readcon-core) and follows Project.toml at bumps >= 2.14.1.
+  # Test both readers against a release with Chemfiles and readcon-core.
   # [[[cog
   # import tomllib
   # v = globals().get("version") or tomllib.load(open("Project.toml", "rb"))["version"]
@@ -42,7 +39,7 @@ env:
   # ref = v if t >= (2, 14, 1) else "2.14.1"
   # cog.outl(f'SEAMS_CORE_READERS_REF: v{ref}')
   # ]]]
-  SEAMS_CORE_READERS_REF: v2.14.1
+  SEAMS_CORE_READERS_REF: v2.14.2
   # [[[end]]]
 
 jobs:
