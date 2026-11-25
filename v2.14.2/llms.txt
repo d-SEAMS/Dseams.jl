@@ -1,0 +1,34 @@
+# Dseams.jl
+
+> Dseams is the Julia front for the d-SEAMS engine: CHILL+, primitive rings, ice and clathrate cages, Steinhardt order parameters and shell symmetry on LAMMPS, XYZ, and optional chemfiles / readcon-core trajectories.
+
+The package is `Dseams`. It calls `libseams_lang`, the C ABI of the d-SEAMS engine, through `ccall`, and gets the library from `libseams_jll` or from a local build named by `SEAMS_LANG_LIB`. Julia 1.10 or newer. The engine, its C API and its documentation site are in d-SEAMS/seams-core; this repository holds only Julia code. Each manual link below is a page of the Documenter site at https://julia.dseams.info/v2.14.2/, and the source markdown of each page is under `docs/src` in the repository. Contributor instructions are in the contributing guide at the repository root, next to README.md.
+
+## Manual
+
+- [Dseams](https://julia.dseams.info/v2.14.2/): What Dseams computes, how it relates to Seams, how the engine library is found, and the example data.
+- [Getting started](https://julia.dseams.info/v2.14.2/getting-started/): Build the engine, configure Dseams, and run a smoke test.
+- [Examples](https://julia.dseams.info/v2.14.2/examples/): The scripts in `examples/`, which the tests run, with the census line each prints.
+- [API](https://julia.dseams.info/v2.14.2/api/): Docstrings of every exported function, each with a doctest.
+- [Julia chapter of the book](https://docs.dseams.info/stable/julia.html): The Julia front in the d-SEAMS documentation.
+- [Video walk-through](https://odysee.com/dseams-julia:ec237bd28c57b7bdfa2996ccc420c16d9799176f): A video walk-through of the Julia package.
+
+## Project
+
+- [README](https://github.com/d-SEAMS/Dseams.jl/blob/main/README.md): Quick start, a local engine build, layout, development and release order.
+- [Repository root](https://github.com/d-SEAMS/Dseams.jl): The contributing guide: layout, test commands, how seams-core and libseams_jll are pinned and found, commit and changelog conventions.
+- [CHANGELOG.md](https://github.com/d-SEAMS/Dseams.jl/blob/main/CHANGELOG.md): Changes by release, Keep a Changelog format.
+- [Seams](https://github.com/d-SEAMS/Dseams.jl/tree/main/lib/Seams): Unregistered example package over the stable `libseams` C API.
+
+## Engine
+
+- [seams-core](https://github.com/d-SEAMS/seams-core): The C++ engine, the C API (`include/seams.h`), the C ABI for language fronts (`bindings/cxx/seams_lang.h`), and the `libseams_jll` Yggdrasil recipe.
+- [d-SEAMS documentation](https://docs.dseams.info): Engine manual, analysis methods, CLI and tutorials.
+
+## Other language fronts
+
+- [PydSEAMSlib](https://github.com/d-SEAMS/PydSEAMSlib): Python.
+- [dseams-r](https://github.com/d-SEAMS/dseams-r): R.
+- [dseams-rs](https://github.com/d-SEAMS/dseams-rs): Rust.
+- [dseams-fortran](https://github.com/d-SEAMS/dseams-fortran): Fortran (fpm).
+- [yodaStruct](https://github.com/d-SEAMS/yodaStruct): Lua and Fennel.
