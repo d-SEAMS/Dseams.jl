@@ -106,16 +106,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          julia --project=docs docs/make.jl
+          base_url="https://julia.dseams.info/${DOCS_RELEASE_TAG:+$DOCS_RELEASE_TAG/}"
+          DSEAMS_DOCS_URL="$base_url" julia --project=docs docs/make.jl
           julia --project=lib/Seams/docs lib/Seams/docs/make.jl
-      - name: Documentation SEO
-        run: |
-          base_url="https://julia.dseams.info/"
-          if [[ -n "$DOCS_RELEASE_TAG" ]]; then
-            base_url="${base_url}${DOCS_RELEASE_TAG}/"
-          fi
-          python3 docs/seo.py check docs/build --base-url "$base_url"
           echo "DOCS_BASE_URL=$base_url" >> "$GITHUB_ENV"
+      - name: Documentation SEO
+        run: python3 docs/seo.py check docs/build --base-url "$DOCS_BASE_URL"
       # README and the built manual. The published root URL is mapped to
       # the build, so a page this commit adds resolves before it deploys.
       # GitHub answers some blob pages with 503 under concurrent requests;
