@@ -12,16 +12,22 @@ on:
     tags: ["v*"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Build and publish a manual from an existing version tag
+        type: string
+        required: false
 
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+  group: ci-${{ inputs.release_tag && format('refs/tags/{0}', inputs.release_tag) || github.ref }}
+  cancel-in-progress: ${{ !inputs.release_tag && !startsWith(github.ref, 'refs/tags/') }}
 
 # The current Julia job publishes the generated manual to gh-pages.
 permissions:
   contents: write
 
 env:
+  DOCS_RELEASE_TAG: ${{ inputs.release_tag || (startsWith(github.ref, 'refs/tags/v') && github.ref_name) || '' }}
   # Use the annotated seams-core tag matching Project.toml.
   SEAMS_CORE_REPO: d-SEAMS/seams-core
   # [[[cog
@@ -52,10 +58,17 @@ jobs:
         julia: ["lts", "1"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.release_tag || github.sha }}
+      - name: Tag matches the package version
+        if: env.DOCS_RELEASE_TAG != ''
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' Project.toml)
+          test "$DOCS_RELEASE_TAG" = "v$version"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ env.SEAMS_CORE_REPO }}
-          ref: ${{ env.SEAMS_CORE_REF }}
+          ref: ${{ env.DOCS_RELEASE_TAG || env.SEAMS_CORE_REF }}
           path: seams-core
       - name: Fetch the cubic ice test trajectory
         working-directory: seams-core
@@ -98,10 +111,11 @@ jobs:
       - name: Documentation SEO
         run: |
           base_url="https://julia.dseams.info/"
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            base_url="${base_url}${GITHUB_REF_NAME}/"
+          if [[ -n "$DOCS_RELEASE_TAG" ]]; then
+            base_url="${base_url}${DOCS_RELEASE_TAG}/"
           fi
           python3 docs/seo.py check docs/build --base-url "$base_url"
+          echo "DOCS_BASE_URL=$base_url" >> "$GITHUB_ENV"
       # README and the built manual. The published root URL is mapped to
       # the build, so a page this commit adds resolves before it deploys.
       # GitHub answers some blob pages with 503 under concurrent requests;
@@ -121,7 +135,7 @@ jobs:
             --accept 200,206,429,503
             --index-files index.html
             --root-dir ${{ github.workspace }}/docs/build
-            --remap "https://julia.dseams.info file://${{ github.workspace }}/docs/build"
+            --remap "${{ env.DOCS_BASE_URL }} file://${{ github.workspace }}/docs/build/"
             --remap "https://github.com/d-SEAMS/Dseams.jl/blob/main file://${{ github.workspace }}"
             README.md docs/build
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -129,8 +143,8 @@ jobs:
         if: matrix.julia == '1'
         run: |
           rm -rf "$RUNNER_TEMP/docs-site"
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            python3 docs/deploy_site.py docs/build "$RUNNER_TEMP/docs-site" --version "$GITHUB_REF_NAME"
+          if [[ -n "$DOCS_RELEASE_TAG" ]]; then
+            python3 docs/deploy_site.py docs/build "$RUNNER_TEMP/docs-site" --version "$DOCS_RELEASE_TAG"
           else
             python3 docs/deploy_site.py docs/build "$RUNNER_TEMP/docs-site" --root
           fi
@@ -143,8 +157,9 @@ jobs:
       - name: Publish crawlable documentation
         if: matrix.julia == '1' && github.repository == 'd-SEAMS/Dseams.jl' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         run: |
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            python3 docs/deploy_site.py docs/build docs-site --version "$GITHUB_REF_NAME"
+          source_sha=$(git rev-parse HEAD)
+          if [[ -n "$DOCS_RELEASE_TAG" ]]; then
+            python3 docs/deploy_site.py docs/build docs-site --version "$DOCS_RELEASE_TAG"
           else
             python3 docs/deploy_site.py docs/build docs-site --root
           fi
@@ -153,7 +168,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           if ! git diff --cached --quiet; then
-            git commit -m "docs: publish $GITHUB_SHA"
+            git commit -m "docs: publish $source_sha"
             git push origin HEAD:gh-pages
           fi
       # Every page of the manual as its published URL, for the live check.
@@ -161,9 +176,7 @@ jobs:
       - name: List the manual pages
         if: matrix.julia == '1'
         working-directory: docs/build
-        env:
-          SITE_ROOT: ${{ startsWith(github.ref, 'refs/tags/') && format('https://julia.dseams.info/{0}/', github.ref_name) || 'https://julia.dseams.info/' }}
-        run: find . -name '*.html' | sed -e 's#^\./##' -e 's#index\.html$##' -e "s#^#$SITE_ROOT#" | sort > "$GITHUB_WORKSPACE/site-pages.txt"
+        run: find . -name '*.html' | sed -e 's#^\./##' -e 's#index\.html$##' -e "s#^#$DOCS_BASE_URL#" | sort > "$GITHUB_WORKSPACE/site-pages.txt"
       - if: matrix.julia == '1'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -177,10 +190,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.release_tag || github.sha }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ env.SEAMS_CORE_REPO }}
-          ref: ${{ env.SEAMS_CORE_READERS_REF }}
+          ref: ${{ env.DOCS_RELEASE_TAG || env.SEAMS_CORE_READERS_REF }}
           path: seams-core
       - name: Fetch the cubic ice test trajectory
         working-directory: seams-core
