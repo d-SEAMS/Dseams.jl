@@ -57,6 +57,9 @@ jobs:
           repository: ${{ env.SEAMS_CORE_REPO }}
           ref: ${{ env.SEAMS_CORE_REF }}
           path: seams-core
+      - name: Fetch the cubic ice test trajectory
+        working-directory: seams-core
+        run: python3 input/fetch.py mW_cubic.lammpstrj
       - uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347 # v0.10.1
         with:
           manifest-path: seams-core/pixi.toml
@@ -179,6 +182,9 @@ jobs:
           repository: ${{ env.SEAMS_CORE_REPO }}
           ref: ${{ env.SEAMS_CORE_READERS_REF }}
           path: seams-core
+      - name: Fetch the cubic ice test trajectory
+        working-directory: seams-core
+        run: python3 input/fetch.py mW_cubic.lammpstrj
       - uses: prefix-dev/setup-pixi@f00437f565399d418b0acc85936d12c1fb668347 # v0.10.1
         with:
           manifest-path: seams-core/pixi.toml
