@@ -37,8 +37,9 @@ julia --project=. -e 'using Pkg; Pkg.test()'
 
 `SEAMS_LANG_LIB` takes precedence over the `libseams_lang` preference
 that `Dseams.set_library!` writes, and either one keeps `libseams_jll`
-from loading. `SEAMS_LIB` is the `libseams` (`include/seams.h`) behind
-the re-exported `seams_*` calls.
+from loading. `SEAMS_LIB` overrides the `libseams` (`include/seams.h`)
+behind the re-exported `seams_*` calls. Without overrides, those calls
+use the matching library from `libseams_jll`.
 
 Two more settings turn on checks against a seams-core checkout:
 `DSEAMS_ROOT` (the larger trajectories in `input/traj`), and

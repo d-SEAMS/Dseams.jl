@@ -35,9 +35,9 @@ around the lower-level `libseams` C API.
 
 ## The engine library
 
-`libseams_jll` provides the engine for Linux (glibc and musl; x86_64,
-aarch64, powerpc64le, riscv64) and macOS once the recipe, pinned to
-seams-core commit `c1efa8c`, is merged into Yggdrasil.
+`libseams_jll` provides both engine libraries for Linux (glibc and musl;
+x86_64, aarch64, powerpc64le, riscv64) and macOS once the recipe for the
+matching seams-core release is merged into Yggdrasil.
 `dev/develop_jll.jl` develops a stand-in `libseams_jll` with no binaries,
 and the engine is a local build of
 [seams-core](https://github.com/d-SEAMS/seams-core). To use one, name its
@@ -50,7 +50,8 @@ Dseams.set_library!("/path/to/seams-core/bbdir/bindings/libseams_lang.so")
 
 This writes the `libseams_lang` preference to `LocalPreferences.toml`.
 The `SEAMS_LANG_LIB` environment variable takes precedence over the
-preference. With either one set, `libseams_jll` is not loaded.
+preference. When either one names a local engine, `SEAMS_LIB` can name
+its companion C API library.
 
 To replace the whole JLL artifact with an install prefix instead, use
 an `Overrides.toml` in `~/.julia/artifacts`, as for any JLL.

@@ -11,8 +11,8 @@ preference names it; see [`Dseams.set_library!`](@ref).
 CxxWrap is not required. Ice Ih (`data/ice1h.lammpstrj`, every
 atom) is 128 hexagonal waters and 256 primitive six-rings.
 
-The C API names re-exported here call `libseams` (`SEAMS_LIB`, else the
-loader path) and are System, seams_system_count, seams_system_read,
+The C API names re-exported here call `libseams` through
+[`Dseams.capi_library_path`](@ref) and are System, seams_system_count, seams_system_read,
 seams_chill, seams_steinhardt, seams_cages,
 seams_signature_cages, seams_neighbours_knn, seams_rdf, seams_running_cn,
 seams_coordination, seams_hbonds, seams_density_axis, seams_fingerprint,
@@ -71,10 +71,15 @@ const _JLL = Base.PkgId(Base.UUID("7f1e8526-9a03-57ab-a5c6-46114804ed15"), "libs
 
 # The JLL is loaded only when no local build is named. Loading both would
 # put two libyodaLib with one soname in the process.
-function _jll_library()
+function _jll_library(product::Symbol, fallback::String)
     jll = Base.require(_JLL)
-    Base.invokelatest(jll.is_available) || return "libseams_lang"
-    Base.invokelatest(getproperty, jll, :libseams_lang_path)
+    Base.invokelatest(jll.is_available) || return fallback
+    Base.invokelatest(getproperty, jll, product)
+end
+
+function _local_language_library()
+    path = get(ENV, "SEAMS_LANG_LIB", "")
+    isempty(path) ? load_preference(@__MODULE__, "libseams_lang", "") : path
 end
 
 """
@@ -85,11 +90,24 @@ The `libseams_lang` that Dseams opens: `ENV["SEAMS_LANG_LIB"]`, else the
 JLL has no build, `"libseams_lang"` is looked up on the loader path.
 """
 function library_path()
-    path = get(ENV, "SEAMS_LANG_LIB", "")
+    path = _local_language_library()
     isempty(path) || return path
-    path = load_preference(@__MODULE__, "libseams_lang", "")
-    isempty(path) || return path
-    _jll_library()
+    _jll_library(:libseams_lang_path, "libseams_lang")
+end
+
+"""
+    capi_library_path()
+
+Name or path of `libseams`, the library behind the re-exported C API.
+`SEAMS_LIB` overrides it. A local `libseams_lang` override keeps the C API
+on the system loader path unless `SEAMS_LIB` is set. The default uses
+the matching `libseams` from `libseams_jll`.
+"""
+function capi_library_path()
+    get(ENV, "SEAMS_LIB") do
+        isempty(_local_language_library()) || return "libseams"
+        _jll_library(:libseams_path, "libseams")
+    end
 end
 
 """

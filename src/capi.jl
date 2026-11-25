@@ -14,7 +14,7 @@ const _seams_dl = Ref{Ptr{Cvoid}}(C_NULL)
 
 function _seams_so()
     if _seams_dl[] == C_NULL
-        _seams_dl[] = dlopen(get(ENV, "SEAMS_LIB", "libseams"))
+        _seams_dl[] = dlopen(capi_library_path())
     end
     _seams_dl[]
 end

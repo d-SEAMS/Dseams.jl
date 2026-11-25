@@ -22,8 +22,10 @@ preference) instead.
 3. =libseams_jll.libseams_lang_path= when =libseams_jll.is_available()= is
    =true=, else ="libseams_lang"= on the dynamic loader path.
 
-The lower-level C API wrappers in =src/capi.jl= (and =lib/Seams=) open
-=ENV["SEAMS_LIB"]= or ="libseams"= on the loader path.
+The lower-level C API wrappers in =src/capi.jl= open =ENV["SEAMS_LIB"]= or
+the matching library from =libseams_jll=. With a local engine override,
+they use the system loader path unless =SEAMS_LIB= names a library.
+The standalone =lib/Seams= example uses =SEAMS_LIB= or the system loader path.
 
 ** How do =has_chemfiles()=, =has_readcon()=, and =features()= work?
 

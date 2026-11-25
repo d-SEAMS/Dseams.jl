@@ -33,6 +33,8 @@ export seams_density_axis, seams_fingerprint, seams_contact_pairs, seams_domains
 export seams_monolayer, seams_rings_vertices, seams_site_table
 export SeamsError, ChillLabels, Q4Q6Pair, SixRings
 
+capi_library_path() = get(ENV, "SEAMS_LIB", "libseams")
+
 include("capi.jl")
 
 """Published CHILL+ rule. Matches `SEAMS_CHILL_PUBLISHED`."""

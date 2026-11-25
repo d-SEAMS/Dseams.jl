@@ -2,14 +2,15 @@
 # Science tutorials in Julia, on the stable C API (libseams, SEAMS_LIB).
 # Same numbers as seams-core docs/examples/science_tutorials.py.
 #
-#   julia examples/science_tutorials.jl [ROOT [brine_t0 brine_tend]]
+#   julia --project=. examples/science_tutorials.jl [ROOT [brine_t0 brine_tend]]
 #
 # ROOT is a seams-core checkout (default DSEAMS_ROOT); the frames are in
 # its input/traj.
 
 using Libdl
+using Dseams: capi_library_path
 
-const LIB = get(ENV, "SEAMS_LIB", "libseams")
+const LIB = capi_library_path()
 
 # Julia 1.13 rejects a runtime library name inside ccall.
 const _dl = Ref{Ptr{Cvoid}}(C_NULL)
