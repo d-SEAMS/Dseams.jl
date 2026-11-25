@@ -31,7 +31,8 @@ assembled by [towncrier](https://towncrier.readthedocs.io/).
 ### Fixed
 
 - Indexing a `RingHistogram` with a size that has no ring returns 0 in place of throwing `KeyError`, so a frame with no atoms or no ring of that size gives a count.
-- The Dseams manual now states that the Yggdrasil recipe is pinned to the seams-core commit `c1efa8c`, and no longer describes package release status.
+- The Dseams manual points to the Yggdrasil recipe for the matching engine release.
+- The low-level C API and the science tutorial use the matching `libseams_jll` library when the package runs without local library overrides.
 - The Dseams manual's "The engine library" section, on `libseams_jll`, `Dseams.set_library!`, `LocalPreferences.toml`, `SEAMS_LANG_LIB`, and `Overrides.toml`, is restored after being dropped from the reader rewrite.
 - The Seams quick-run example reads a trajectory into a `System` and calls `six_rings(sys).count`, in place of the no-argument `six_rings()` call that `six_rings` does not accept.
 - The getting-started smoke test no longer escapes `"` inside a single-quoted shell string, which Julia read as a `ParseError`.
